@@ -1,0 +1,6 @@
+@mixin border-bottom($color){
+  border-bottom: 1px solid $color;
+  &:last-child{
+    border-bottom: none;
+  }
+}
