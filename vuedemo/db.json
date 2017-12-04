@@ -1,0 +1,74 @@
+{
+  "getNewsList": [
+    {
+      "id": 1,
+      "title": "这些年，习近平总书记走过的扶贫路text-overflowtext-overflowtext-overflowtext-overflow",
+      "url": "http://www.twicetech.top"
+    },
+    {
+      "id": 2,
+      "title": "小学营养午餐仅火腿肠粉丝？",
+      "url": "http://www.twicetech.top"
+    },
+    {
+      "id": 3,
+      "title": "大学生暑假返乡考驾照",
+      "url": "http://www.twicetech.top"
+    },
+    {
+      "id": 4,
+      "title": "广东发布",
+      "url": "http://www.twicetech.top"
+    },
+    {
+      "id": 5
+    },
+    {
+      "id": 6
+    },
+    {
+      "id": 7
+    }
+  ],
+  "login": {
+    "username": "yudongdong",
+    "userId": 123123
+  },
+  "getPrice": {
+    "amount": 678
+  },
+  "createOrder": {
+    "orderId": "6djk979"
+  },
+  "getOrderList": {
+    "list": [
+      {
+        "orderId": "ddj123",
+        "product": "数据统计",
+        "version": "高级版",
+        "period": "1年",
+        "buyNum": 2,
+        "date": "2016-10-10",
+        "amount": "500元"
+      },
+      {
+        "orderId": "yuj583",
+        "product": "流量分析",
+        "version": "户外版",
+        "period": "3个月",
+        "buyNum": 1,
+        "date": "2016-5-2",
+        "amount": "2200元"
+      },
+      {
+        "orderId": "pmd201",
+        "product": "广告发布",
+        "version": "商铺版",
+        "period": "3年",
+        "buyNum": 12,
+        "date": "2016-8-3",
+        "amount": "7890元"
+      }
+    ]
+  }
+}
