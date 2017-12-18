@@ -9,7 +9,7 @@
 @import "../../common/stylus/mixin.styl";
 
 .g-header
-  height(70px);
+  s-height(70px);
   &.s-header
     font-size: $font-size-large-x;
     color:$color-theme;

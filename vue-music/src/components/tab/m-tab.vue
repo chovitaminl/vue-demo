@@ -25,5 +25,5 @@
     &.router-link-exact-active
       color:$color-theme;
       .tab-link
-        border-bottom:3px inset $color-theme;
+        border-bottom:2px inset $color-theme;
 </style>
