@@ -16,7 +16,7 @@
 </template>
 <script type="text/ecmascript-6">
   import Slide from 'base/slide/slide'
-  import { getRecommend } from 'api/recommend'
+  import { getRecommend, getDissList } from 'api/recommend'
   import { ERR_OK } from 'api/config'
 
   export default {
@@ -25,17 +25,27 @@
     },
     data () {
       return {
-        recommends: []
+        recommends: [],
+        mvList: []
       }
     },
     created () {
       this._getRecommend()
+      this._getDiscList()
     },
     methods: {
       _getRecommend () {
         getRecommend().then((res) => {
           if (res.code === ERR_OK) {
             this.recommends = res.data.slider
+          }
+        })
+      },
+      _getDiscList () {
+        getDissList().then((res) => {
+          if (res.code === ERR_OK) {
+            this.mvList = res.data.list
+            console.log(this.mvList)
           }
         })
       }
