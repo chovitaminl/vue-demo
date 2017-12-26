@@ -2,7 +2,6 @@ export function addClass (el, cls) {
   if (hasClass(el, cls)) {
     return
   }
-  console.log(el, cls)
   let newCls = el.className.split(' ')
   newCls.push(cls)
   el.className = newCls.join(' ')
