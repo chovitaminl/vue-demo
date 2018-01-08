@@ -4,7 +4,7 @@
       <div>
         <div class="g-slider" v-if="recommends.length">
           <slider>
-            <div class="text-center" v-for="slider in recommends">
+            <div class="text-center" v-for="(slider,index) in recommends" :key="index">
               <a :href="slider.linkUrl" :key="slider.id">
                 <img class="needsclick" @load="loadImage" :src="slider.picUrl" alt=""/>
               </a>
@@ -13,7 +13,7 @@
         </div>
         <div class="g-recommend-list">
           <h1 class="g-list-title s-list-title text-center">热门歌单推荐</h1>
-          <div class="g-item g-flex" v-for="(item,index) in dissList">
+          <div class="g-item g-flex" v-for="(item,index) in dissList" :key="index">
             <img class="g-icon" v-lazy="item.imgurl" alt=""/>
             <div class="g-text g-flex">
               <div class="name" v-html="item.creator.name"></div>

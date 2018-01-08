@@ -15,6 +15,7 @@
   height: 40px;
   line-height : 40px;
   .g-tab-item
+    flex:1
     &.s-tab-item
       color:#898989;
       .tab-link

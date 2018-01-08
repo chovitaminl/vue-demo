@@ -20,6 +20,10 @@
         type: Array,
         default: null
       },
+      listenScroll: {
+        type: Boolean,
+        default: false
+      },
       refreshDelay: {
         type: Number,
         default: 20
@@ -39,6 +43,12 @@
           probeType: this.probeType,
           click: this.click
         })
+        if (this.listenScroll) {
+          this.scroll.on('scroll', (pos) => {
+            let me = this
+            me.$emit('scroll', pos)
+          })
+        }
       },
       disable () {
         this.scroll && this.scroll.disable()
@@ -48,12 +58,17 @@
       },
       refresh () {
         this.scroll && this.scroll.refresh()
+      },
+      scrollTo () {
+        this.scroll && this.scroll.scrollTo.apply(this.scroll, arguments)
+      },
+      scrollToElement () {
+        this.scroll && this.scroll.scrollToElement.apply(this.scroll, arguments)
       }
     },
     watch: {
       data () {
         setTimeout(() => {
-          console.log('data', this.data)
           this.refresh()
         }, this.refreshDelay)
       }

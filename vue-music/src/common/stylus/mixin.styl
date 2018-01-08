@@ -21,6 +21,11 @@ extend-click()
     right: -10px
     bottom: -10px
 
-s-height($height)
+s-height($height = 30px)
   height: $height;
   line-height: $height;
+
+last-border($color...)
+  border-bottom: 1px solid $color
+  &:last-child
+    border-bottom: none

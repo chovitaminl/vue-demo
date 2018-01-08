@@ -19,5 +19,3 @@ export function getSinger () {
 
   return jsonp(url, data, options)
 }
-
-

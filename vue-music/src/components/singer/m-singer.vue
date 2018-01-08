@@ -1,13 +1,23 @@
 <template>
-  <div class="g-singer">singer</div>
+  <div class="g-singer">
+    <list-view :data="singers" @select="selectSinger"></list-view>
+    <router-view></router-view>
+  </div>
 </template>
 <script type="text/ecmascript-6">
-  import {getSinger} from 'api/singer'
+  import { getSinger } from 'api/singer'
   import { ERR_OK } from 'api/config'
+  import { mapMutations } from 'vuex'
   import Singer from 'common/js/singer'
+  import ListView from 'base/listView/listview'
+
   const HOT_SINGER_LEN = 10
   const HOT_NAME = '热门'
+
   export default {
+    components: {
+      ListView
+    },
     created () {
       this._getSingerList()
     },
@@ -17,11 +27,17 @@
       }
     },
     methods: {
+      selectSinger (singer) {
+        this.$router.push({
+          path: `/singer/${singer.id}`
+        })
+        this.setSinger(singer)
+      },
       _getSingerList () {
         getSinger().then((res) => {
           if (res.code === ERR_OK) {
-            this.singers = res.data.list
-            console.log('singerList', this._normalizeSingers(this.singers))
+            this.singers = this._normalizeSingers(res.data.list)
+            console.log('this.singers::', this.singers)
           }
         })
       },
@@ -67,7 +83,10 @@
           })
         }
         return hot.concat(ret)
-      }
+      },
+      ...mapMutations({
+        setSinger: 'SET_SINGER'
+      })
     }
   }
 </script>
