@@ -38,6 +38,7 @@
           if (res.code === ERR_OK) {
             this.singers = this._normalizeSingers(res.data.list)
             console.log('this.singers::', this.singers)
+            console.log('this.$router', this.$router)
           }
         })
       },
