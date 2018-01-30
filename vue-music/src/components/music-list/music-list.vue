@@ -213,7 +213,8 @@
       bottom: 0
       width: 100%
       .g-singer-list
-        padding: 20px 30px
+        margin: 20px 0
+        padding: 0 30px
       .loading-container
         position: absolute
         width: 100%

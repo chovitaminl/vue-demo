@@ -1,98 +1,117 @@
 <template>
   <div class="player" v-show="playlist.length>0">
-    <transition-group name="normal">
+    <transition name="normal">
       <div class="normal-player" v-show="fullScreen">
         <div class="background">
-          <img width="100%" height="100%" src="" alt="">
+          <img width="100%" height="100%" :src="currentSong.image" alt="">
         </div>
         <div class="top">
-          <div class="back">
+          <div class="back" @click="back">
             <i class="icon-back"></i>
           </div>
-          <h1 class="title"></h1>
-          <h2 class="subtitle"></h2>
+          <h1 class="title" v-html="currentSong.name"></h1>
+          <h2 class="subtitle" v-html="currentSong.singer"></h2>
         </div>
-      </div>
-      <div class="middle">
-        <div class="middle-l">
-          <div class="cd-wrapper">
-            <div class="cd">
-              <img class="image"/>
+        <div class="middle">
+          <div class="middle-l">
+            <div class="cd-wrapper">
+              <div class="cd">
+                <img class="image" :src="currentSong.image"/>
+              </div>
+            </div>
+            <div class="playing-lyric-wrapper">
+              <div class="playing-lyric"></div>
             </div>
           </div>
-          <div class="playing-lyric-wrapper">
-            <div class="playing-lyric"></div>
-          </div>
-        </div>
-        <div class="middle-r">
-          <div class="lyric-wrapper">
-            <div>
-              <p class="text"></p>
+          <div class="middle-r">
+            <div class="lyric-wrapper">
+              <div>
+                <p class="text"></p>
+              </div>
             </div>
           </div>
         </div>
-      </div>
-      <div class="bottom">
-        <div class="dot-wrapper">
-          <span class="dot"></span>
-          <span class="dot"></span>
-        </div>
-        <div class="progress-wrapper">
-          <span class="time time-l"></span>
-          <div class="progress-bar-wrapper">
+        <div class="bottom">
+          <div class="dot-wrapper">
+            <span class="dot"></span>
+            <span class="dot"></span>
+          </div>
+          <div class="progress-wrapper">
+            <span class="time time-l"></span>
+            <div class="progress-bar-wrapper">
 
+            </div>
+            <span class="time time-r"></span>
           </div>
-          <span class="time time-r"></span>
+          <div class="operators">
+            <div class="icon i-left">
+              <i class="icon-random"></i>
+            </div>
+            <div class="icon i-left">
+              <i class="icon-prev"></i>
+            </div>
+            <div class="icon i-center">
+              <i class="icon-play"></i>
+            </div>
+            <div class="icon i-right">
+              <i class="icon-next"></i>
+            </div>
+            <div class="icon i-right">
+              <i class="icon-favorite"></i>
+            </div>
+          </div>
         </div>
-        <div class="operators">
-          <div class="icon i-left">
-            <i></i>
+      </div>
+    </transition>
+    <transition name="mini">
+      <div class="mini-player"
+           @click="open"
+           v-show="!fullScreen">
+        <div class="mini-lt">
+          <div class="icon">
+            <img :src="currentSong.image" width="55" height="55" alt="">
           </div>
-          <div class="icon i-left">
-            <i></i>
+          <div class="text">
+            <div class="name" v-html="currentSong.name"></div>
+            <div class="desc" v-html="currentSong.singer"></div>
           </div>
-          <div class="icon i-center">
-            <i></i>
+        </div>
+        <div class="mini-rt">
+          <div class="control">
+            <i class="icon-pause-mini"></i>
           </div>
-          <div class="icon i-right">
-            <i></i>
-          </div>
-          <div class="icon i-right">
-            <i></i>
+          <div class="control">
+            <i class="icon-playlist"></i>
           </div>
         </div>
       </div>
-    </transition-group>
-    <transition-group name="mini">
-      <div class="mini-player" v-show="!fullScreen">
-        <div class="icon">
-          <img src="" width="40" height="40" alt="">
-        </div>
-        <div class="text">
-          <div class="name"></div>
-          <div class="desc"></div>
-        </div>
-        <div class="control">
-          <i></i>
-        </div>
-        <div class="control">
-          <i></i>
-        </div>
-      </div>
-    </transition-group>
+    </transition>
   </div>
 </template>
 <script type="text/ecmascript-6">
-  import {mapGetters} from 'vuex'
+  import { mapGetters, mapMutations } from 'vuex'
 
   export default {
 //    data () {
 //      return {
 //      }
 //    },
+    methods: {
+      back () {
+        this.setFullScreen(false)
+      },
+      open () {
+        console.log(this.playlist)
+        this.setFullScreen(true)
+      },
+      ...mapMutations({
+        setFullScreen: 'SET_FULL_SCREEN'
+      })
+    },
     computed: {
       ...mapGetters([
         'fullScreen',
+        'currentSong',
         'playlist',
         'playing',
         'currentIndex'
@@ -104,6 +123,7 @@
   @import "~common/stylus/variable"
   @import "~common/stylus/mixin"
 
+  $height-mini = 80px
   .player
     .normal-player
       position: fixed
@@ -113,10 +133,16 @@
       right: 0
       z-index: 150
       background-color: $color-background
-      &.normal-enter-active,&.normal-leave-active
-        transition: all 0.4s
-      &.normal-enter,&.normal-leave-to
+      &.normal-enter-active, &.normal-leave-active
+        transition: opacity  0.4s
+        .top,.bottom
+          transition: transform  0.4s cubic-bezier(0.86, 0.18, 0.082, 1.32)
+      &.normal-enter, &.normal-leave-to
         opacity: 0
+        .top
+          transform: translate3d(0, -100px, 0)
+        .bottom
+          transform: translate3d(0, 100px, 0)
       .background
         position: absolute
         left: 0
@@ -140,19 +166,19 @@
             font-size: $font-size-large-x
             color: $color-theme
             transform: rotate(-90deg)
-          .title
-            margin: 0 auto
-            width: 70%
-            line-height: 40px
-            text-align: center
-            no-wrap()
-            font-size: $font-size-large
-            color: $color-text
-          .subtitle
-            line-height: 20px
-            text-align: center
-            font-size: $font-size-medium
-            color: $color-text
+        .title
+          margin: 0 auto
+          width: 70%
+          line-height: 40px
+          text-align: center
+          no-wrap()
+          font-size: $font-size-large
+          color: $color-text
+        .subtitle
+          line-height: 20px
+          text-align: center
+          font-size: $font-size-medium
+          color: $color-text
       .middle
         position: fixed
         width: 100%
@@ -177,8 +203,11 @@
               width: 100%
               height: 100%
               box-sizing: border-box
-              border: 10px solid rgba(255,255,255,0.1)
+              border: 10px solid rgba(255, 255, 255, 0.1)
               border-radius: 50%
+              .image
+                width: 100%
+                border-radius: 50%
           .playing-lyric-wrapper
             margin: 30px auto 0 auto
             width: 80%
@@ -267,29 +296,40 @@
             color: $color-sub-theme
     .mini-player
       position: fixed
+      display: flex
       left: 0
       bottom: 0
+      justify-content: space-between
+      align-items: center
       z-index: 180
       width: 100%
-      height: 60px
+      height: $height-mini
       background-color: $color-highlight-background
-      &.min-enter-active,&.min-leave-active
+      &.mini-enter-active, &.mini-leave-active
         transition: all 0.4s
-      &.min-enter,&.mini-leave-to
+      &.mini-enter, &.mini-leave-to
         opacity: 0
-      .icon
-        flex: 0 0 40px
-        width: 40px
-        padding: 0 10px 0 20px
-        img
-          border-radius: 50%
-          &.play
-            animation: rotate 10s linear infinite
-          &.pause
-            animation-play-state: paused
+      .mini-lt, .mini-rt
+        display: flex
+        height: 100%
+        align-items: center
+      .mini-lt
+        flex: 0 0 70%
+        width: 70%
+        text-align: left
+        .icon
+          flex: 0 0 55px
+          width: 55px
+          padding: 0 10px 0 15px
+          img
+            border-radius: 50%
+            &.play
+              animation: rotate 10s linear infinite
+            &.pause
+              animation-play-state: paused
         .text
           display: flex
-          flex-direction:column
+          flex-direction: column
           justify-content: center
           flex: 1
           line-height: 20px
@@ -303,6 +343,12 @@
             no-wrap()
             font-size: $font-size-small
             color: $color-text-d
+      .mini-rt
+        flex: 0 0 100px
+        width: 100px
+        text-align: right
+        align-items: center
+        justify-content: flex-end
         .control
           flex: 0 0 30px
           width: 30px
@@ -315,6 +361,7 @@
             position: absolute
             left: 0
             top: 0
+
   @keyframes rotate
     0%
       transform: rotate(0)
