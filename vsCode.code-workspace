@@ -1,0 +1,16 @@
+{
+	"folders": [
+		{
+			"path": "音乐播放器源码"
+		},
+		{
+			"path": "vue-music"
+		},
+		{
+			"path": "F:\\Github\\tool-library"
+		}
+	],
+	"settings": {
+		"git.ignoreLimitWarning": true
+	}
+}

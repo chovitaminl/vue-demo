@@ -4,7 +4,7 @@ const mutations = {
   [types.SET_SINGER] (state, singer) {
     state.singer = singer
   },
-  [types.SET_PLAYING] (state, flag) {
+  [types.SET_PLAYING_STATE] (state, flag) {
     state.playing = flag
   },
   [types.SET_FULL_SCREEN] (state, flag) {
@@ -19,7 +19,7 @@ const mutations = {
   [types.SET_MODE] (state, mode) {
     state.mode = mode
   },
-  [types.SET_CUREET_INDEX] (state, index) {
+  [types.SET_CURRENT_INDEX] (state, index) {
     state.currentIndex = index
   },
   [types.SET_DISC] (state, disc) {

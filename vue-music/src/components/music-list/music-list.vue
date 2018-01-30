@@ -27,7 +27,8 @@
             ref="songList"
     >
       <div class="g-singer-list">
-        <song-list :songs="songs"></song-list>
+        <song-list @select="selectItem"
+                   :songs="songs"></song-list>
       </div>
       <div class="loading-container" v-show="!this.songs.length">
         <loading></loading>
@@ -40,6 +41,7 @@
   import songList from 'base/song-list/song-list'
   import loading from 'base/loading/loading'
   import { prefixStyle } from 'common/js/dom'
+  import {mapActions} from 'vuex'
 
   const RESERVED_HEIGHT = 40
   const transform = prefixStyle('transform')
@@ -109,7 +111,16 @@
       },
       scroll (pos) {
         this.scrollY = pos.y
-      }
+      },
+      selectItem (item, index) {
+        this.selectPlay({
+          list: this.songs,
+          index
+        })
+      },
+      ...mapActions([
+        'selectPlay'
+      ])
     },
     created () {
       this.probeType = 3
