@@ -62,7 +62,7 @@
               <i class="icon-next"></i>
             </div>
             <div class="icon i-right">
-              <i class="icon-favorite"></i>
+              <i class="icon-not-favorite"></i>
             </div>
           </div>
         </div>
