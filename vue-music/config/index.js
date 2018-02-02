@@ -20,6 +20,16 @@ module.exports = {
         headers: {
           referer: 'https://y.qq.com/portal/playlist.html'
         }
+      },
+      '/api/getSongKey': {
+        target: 'https://c.y.qq.com',
+        changeOrigin: true,
+        pathRewrite: {
+          '/api/getSongKey':'/base/fcgi-bin/fcg_music_express_mobile3.fcg'
+        },
+        headers: {
+          referer: 'https://y.qq.com/portal/player.html'
+        }
       }
     },
 
