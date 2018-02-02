@@ -19,7 +19,7 @@
         </div>
         <div class="middle">
           <div class="middle-l">
-            <div class="cd-wrapper" ref="cdWrapper">
+            <div class="cd-wrapper" ref="cdWrapper" :class="cdCls">
               <div class="cd">
                 <img class="image" :src="currentSong.image"/>
               </div>
@@ -56,7 +56,7 @@
               <i class="icon-prev"></i>
             </div>
             <div class="icon i-center">
-              <i class="icon-play"></i>
+              <i @click="togglePlay" :class="playIcon"></i>
             </div>
             <div class="icon i-right">
               <i class="icon-next"></i>
@@ -83,7 +83,7 @@
         </div>
         <div class="mini-rt">
           <div class="control">
-            <i class="icon-pause-mini"></i>
+            <i @click.stop="togglePlay" :class="playIconMin"></i>
           </div>
           <div class="control">
             <i class="icon-playlist"></i>
@@ -91,6 +91,7 @@
         </div>
       </div>
     </transition>
+    <audio ref="audio" :src="currentSong.url"></audio>
   </div>
 </template>
 <script type="text/ecmascript-6">
@@ -106,6 +107,9 @@
 //      }
 //    },
     methods: {
+      togglePlay () {
+        this.setPlayingState(!this.playing)
+      },
       back () {
         this.setFullScreen(false)
       },
@@ -170,10 +174,20 @@
         }
       },
       ...mapMutations({
-        setFullScreen: 'SET_FULL_SCREEN'
+        setFullScreen: 'SET_FULL_SCREEN',
+        setPlayingState: 'SET_PLAYING_STATE'
       })
     },
     computed: {
+      playIcon () {
+        return this.playing ? 'icon-play' : 'icon-pause'
+      },
+      playIconMin () {
+        return this.playing ? 'icon-play-mini' : 'icon-pause-mini'
+      },
+      cdCls () {
+        return this.playing ? 'play' : 'play pause'
+      },
       ...mapGetters([
         'fullScreen',
         'currentSong',
@@ -181,6 +195,19 @@
         'playing',
         'currentIndex'
       ])
+    },
+    watch: {
+      currentSong () {
+        this.$nextTick(() => {
+          this.$refs.audio.play()
+        })
+      },
+      playing (newPlaying) {
+        const audio = this.$refs.audio
+        this.$nextTick(() => {
+          newPlaying ? audio.play() : audio.pause()
+        })
+      }
     }
   }
 </script>
@@ -264,6 +291,10 @@
             top: 0
             width: 80%
             height: 100%
+            &.play
+              animation: 20s rotate linear infinite
+            &.pause
+              animation-play-state: paused
             .cd
               width: 100%
               height: 100%

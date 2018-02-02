@@ -5,7 +5,7 @@
   </div>
 </template>
 <script type="text/ecmascript-6">
-  import { getSinger, getSongKeyInfo } from 'api/singer'
+  import { getSinger } from 'api/singer'
   import { ERR_OK } from 'api/config'
   import { mapMutations } from 'vuex'
   import Singer from 'common/js/singer'
@@ -34,7 +34,7 @@
         this.setSinger(singer)
       },
       _getSingerList () {
-        getSinger(this.singer.).then((res) => {
+        getSinger().then((res) => {
           if (res.code === ERR_OK) {
             this.singers = this._normalizeSingers(res.data.list)
             console.log('this.singers::', this.singers)
