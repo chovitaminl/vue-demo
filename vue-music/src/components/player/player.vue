@@ -53,13 +53,13 @@
               <i class="icon-random"></i>
             </div>
             <div class="icon i-left">
-              <i class="icon-prev"></i>
+              <i @click="prev" class="icon-prev"></i>
             </div>
             <div class="icon i-center">
               <i @click="togglePlay" :class="playIcon"></i>
             </div>
             <div class="icon i-right">
-              <i class="icon-next"></i>
+              <i @click="next" class="icon-next"></i>
             </div>
             <div class="icon i-right">
               <i class="icon-not-favorite"></i>
@@ -91,7 +91,7 @@
         </div>
       </div>
     </transition>
-    <audio ref="audio" :src="currentSong.url"></audio>
+    <audio ref="audio" :src="currentSong.url" @canplay="readyPlay" @error="error"></audio>
   </div>
 </template>
 <script type="text/ecmascript-6">
@@ -102,19 +102,54 @@
   const transform = prefixStyle('transform')
 
   export default {
-//    data () {
-//      return {
-//      }
-//    },
+    data () {
+      return {
+        canPlayFlag: false
+      }
+    },
     methods: {
+      readyPlay () {
+        this.canPlayFlag = true
+      },
+      error () {},
+      prev () {
+        if (!this.canPlayFlag) {
+          return
+        }
+        let index = this.currentIndex - 1
+        if (index < 0) {
+          index = this.playlist.length - 1
+        }
+        this.setCurrentIndex(index)
+        if (!this.playing) {
+          this.togglePlay()
+        }
+        this.canPlayFlag = false
+      },
+      next () {
+        if (!this.canPlayFlag) {
+          return
+        }
+        let index = this.currentIndex + 1
+        if (index > this.playlist.length) {
+          index = 0
+        }
+        this.setCurrentIndex(index)
+        if (!this.playing) {
+          this.togglePlay()
+        }
+        this.canPlayFlag = false
+      },
       togglePlay () {
+        if (!this.canPlayFlag) {
+          return
+        }
         this.setPlayingState(!this.playing)
       },
       back () {
         this.setFullScreen(false)
       },
       open () {
-        console.log(this.playlist)
         this.setFullScreen(true)
       },
       enter (el, done) {
@@ -175,7 +210,8 @@
       },
       ...mapMutations({
         setFullScreen: 'SET_FULL_SCREEN',
-        setPlayingState: 'SET_PLAYING_STATE'
+        setPlayingState: 'SET_PLAYING_STATE',
+        setCurrentIndex: 'SET_CURRENT_INDEX'
       })
     },
     computed: {
@@ -230,6 +266,7 @@
         .top, .bottom
           transition: transform 0.4s cubic-bezier(0.86, 0.18, 0.082, 1.32)
       &.normal-enter, &.normal-leave-to
+        display: none
         opacity: 0
         .top
           transform: translate3d(0, -100px, 0)
