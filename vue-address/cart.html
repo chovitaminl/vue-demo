@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width,inital-scale=1">
+    <link href="assets/css/style.css" rel="stylesheet"/>
+    <title>cart</title>
+</head>
+<body>
+
+<div id="cart" class="shopping-cart">
+    <ul class="head">
+        <li class="item">商品图片</li>
+        <li class="item">商品名称</li>
+        <li class="item">单价</li>
+        <li class="item">数量</li>
+        <li class="item">总价</li>
+        <li class="item">赠品</li>
+    </ul>
+    <div class="desc" v-for="(item,index) in productList">
+        <ul class="body">
+            <p class="item-check" :class="{'checked':item.checked}" @click="selectProduct(item)"></p>
+            </p>
+            <li class="item item-image">
+                <img :src="item.productImage" alt="1x1"></li>
+            <li class="item item-name" v-text="item.productName">cpu</li>
+            <li class="item item-price">{{item.productPrice | formatMenoy}}</li>
+            <li class="item item-num"><a href="javascript:;" @click="changeMoney(item,-1)">-</a><input type="num"
+                                                                                                       disabled
+                                                                                                       v-model="item.productQuentity"><a
+                    href="javascript:;" @click="changeMoney(item,1)">+</a></li>
+            <li class="item item-total">{{item.productPrice*item.productQuentity | menoy('元')}}
+                <span class="item cursor" @click="delconfirm(item)">删除</span>
+            </li>
+        </ul>
+        <ul class="donation">
+            <li class="item part">
+                <span><b>赠送品：</b></span><span v-for="(part,index) in item.parts" v-text="part.partName+' '">蒙牛</span>
+            </li>
+        </ul>
+    </div>
+    <div class="total">
+        <div class="choose">
+            <span @click="checkAll(true)"><span class="item-check" :class="{'checked':checkAllFlag}"></span>全选</span>
+
+            <span style="background-color:#fff!important" :class="{'checked':checkAllFlag}" @click="checkAll(false)">取消全选</span>
+        </div>
+        <div class="totalMenoy">
+            总金额：<span>{{totalMoney | menoy('元')}}</span>
+        </div>
+        <div class="clearfix"></div>
+    </div>
+
+    <div class="hide-background" :class="{'show':showDelBox}">
+        <div class="del-box">
+            <div class="del" @click="showDelBox=false">x</div>
+            <div class="choose">
+                <div class="content">Are you del this product?</div>
+                <div class="ok" @click="delProduct()">yes</div>
+                <div class="no" @click="showDelBox=false">no</div>
+            </div>
+        </div>
+    </div>
+
+</div>
+<script src="assets/js/vue.js"></script>
+<script src="assets/js/vue-resource.js  "></script>
+
+<script>
+    var vm = new Vue({
+        el: "#cart",
+        data: {
+            totalMoney: 0,
+            productList: [],
+            checkAllFlag: false,
+            showDelBox:false,
+            currProduct:''
+        },
+        filters: {
+            formatMenoy: function (value) {
+                return '￥' + value.toFixed(2);
+            },
+            menoy: function (value, type) {
+                return '￥' + value.toFixed(2) + type;
+            }
+        },
+        mounted: function () {
+            this.$nextTick(function () {
+                this.cartView();
+            })
+        },
+        methods: {
+            cartView: function () {
+                var this_ = this;
+                this_.$http.get("datas.json").then(function (res) {
+                    this_.productList = res.body.results.lists;
+                    this_.totalMoney = res.body.results.totalMoney;
+                });
+            },
+            changeMoney: function (product, way) {
+                if (way > 0) {
+                    ++product.productQuentity;
+                } else {
+                    product.productQuentity = Math.max(1, --product.productQuentity);
+                }
+
+                this.productTotalPrice();
+            },
+            selectProduct: function (item) {
+                if ('undefined' === typeof item.checked) {
+                    Vue.set(item, 'checked', true);
+//                    this.$set(item,'checked',true);
+                } else {
+                    item.checked = !item.checked;
+                }
+                this.productTotalPrice();
+            },
+            checkAll: function (flag) {
+                this.checkAllFlag = flag;
+                var _this = this;
+                this.productList.forEach(function (item, index) {
+                    if ('undefined' == typeof item.checked) {
+                        _this.$set(item, 'checked', _this.checkAllFlag);
+                    } else {
+                        item.checked = _this.checkAllFlag;
+                    }
+                });
+                this.productTotalPrice();
+            },
+            productTotalPrice: function () {
+                var _this = this;
+                this.totalMoney = 0;
+                this.productList.forEach(function (item, index) {
+                    if (item.checked) {
+                        _this.totalMoney += item.productQuentity * item.productPrice;
+
+                    }
+                });
+            },
+            delconfirm:function (item) {
+                this.currProduct = item;
+                this.showDelBox = true;
+            },
+            delProduct:function () {
+                var index = this.productList.indexOf(this.currProduct);
+                this.productList.splice(index,1);
+                this.showDelBox = false;
+            }
+        }
+    });
+</script>
+
+</body>
+</html>

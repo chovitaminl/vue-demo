@@ -1,0 +1,207 @@
+$cartBoxWidth: 90%;
+$imageWidth: 60px;
+$cartBodyNumWidth: 30px;
+$cartBodyAddDivideWidth: 15px;
+$cartHeadColor: #ccc;
+$cartBodyBorderColor: #f9f9f9;
+$cartButtomHoverColor: #d7d7d7;
+$borderWidth:3px;
+
+.shopping-cart {
+  width: $cartBoxWidth;
+  margin: 0 auto;
+  padding: 0 0 0 0;
+  box-sizing: border-box;
+  border: 1px solid $cartHeadColor;
+  text-align: center;
+  ul.head {
+    display: flex;
+    padding: 20px 10px;
+    margin: 0;
+    background-color: #f9f9f9;
+    justify-content: flex-start;
+
+    li.item {
+      list-style-type: none;
+      flex-grow: 1;
+      align-items: flex-start;
+
+    }
+  }
+  div.desc {
+    border-bottom: 1px solid $cartBodyBorderColor;
+    ul.body {
+      display: flex;
+      padding: 20px 0;
+      justify-content: space-around;
+      p.item-check{
+        width: $borderWidth;
+        height: $borderWidth;
+        display: inline-block;
+        padding:2px;
+        background-color: #fff;
+        border:1px solid #000;
+        border-radius: $borderWidth;
+        &:hover{
+          background-color:#ffc520;
+        }
+
+      }
+      .checked{
+        background-color: #ffc520!important;
+      }
+      li.item {
+        list-style-type: none;
+        flex-grow: 1;
+        align-items: flex-start;
+
+        a {
+          text-decoration: none;
+        }
+      }
+      li.item-image {
+        img {
+          width: $imageWidth;
+          height: $imageWidth;
+        }
+      }
+      li.item-num {
+        input {
+          width: $cartBodyNumWidth;
+        }
+        a {
+          text-decoration: none;
+          display: inline-block;
+          width: $cartBodyAddDivideWidth;
+          height: $cartBodyAddDivideWidth;
+          border-radius: $cartBodyAddDivideWidth/2;
+          background-color: $cartHeadColor;
+          line-height: $cartBodyAddDivideWidth;
+          text-align: center;
+          margin: 0 10px;
+          &hover {
+            background-color: $cartButtomHoverColor;
+          }
+        }
+      }
+    }
+    ul.donation {
+      text-align: left;
+      li.part {
+        list-style-type: none;
+        span {
+          text-align: left;
+        }
+      }
+    }
+  }
+  div.total{
+    padding:30px 40px;
+    div.choose{
+      float: left;
+      >span{
+        cursor:pointer;
+      }
+      margin-right:20px;
+        span.item-check{
+          width: $borderWidth;
+          height: $borderWidth;
+          display: inline-block;
+          padding:2px;
+          background-color: #fff;
+          border:1px solid #000;
+          border-radius: $borderWidth;
+          &:hover{
+            background-color:#ffc520;
+          }
+
+        }
+        .checked{
+          background-color: #ffc520!important;
+        }
+
+        span.item-check{
+          width: $borderWidth;
+          height: $borderWidth;
+          display: inline-block;
+          padding:2px;
+          background-color: #fff;
+          border:1px solid #000;
+          border-radius: $borderWidth;
+          &:hover{
+            background-color:#ffc520;
+          }
+
+        }
+        .checked{
+          background-color: #ffc520!important;
+        }
+      }
+
+    div.totalMenoy{
+      float:right;
+
+    }
+    .clearfix{
+      height: 0;
+      display: block;
+      clear: both;
+      visibility: hidden;
+    }
+  }
+}
+
+.hide-background{
+  display: none;
+  position: fixed;
+  top:0;
+  bottom: 0;
+  left: 0;
+  right:0;
+  background-color: rgba(91, 100, 81, 0.58);
+  .del-box{
+    width: 250px;
+    height:200px;
+    position: absolute;
+    top: calc(50% - 100px);
+    left:calc(50% - 125px);
+    background-color: #fff;
+    padding:10px 20px;
+    text-align: center;
+    .del{
+      position: relative;
+      left:50%;
+      display: inline-block;
+      padding:0 20px;
+      font-size: 24px;
+      cursor:pointer;
+      &:hover{
+        -webkit-transform: rotateZ(90deg);
+        -moz-transform: rotateZ(90deg);
+        -ms-transform: rotateZ(90deg);
+        -o-transform: rotateZ(90deg);
+        transform: rotateZ(90deg);
+        -webkit-transition: all .5s;
+        -moz-transition: all .5s;
+        -ms-transition: all .5s;
+        -o-transition: all .5s;
+        transition: all .5s;
+      }
+    }
+    .ok,.no{
+      display: inline-block;
+      width:40%;
+      height:25px;
+      margin-top:30px;
+      text-align: center;
+      background-color: wheat;
+      cursor: pointer;
+    }
+  }
+}
+.show{
+  display: block!important;
+}
+.cursor{
+  cursor:pointer;
+}

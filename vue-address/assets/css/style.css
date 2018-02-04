@@ -1,0 +1,154 @@
+.shopping-cart {
+  width: 90%;
+  margin: 0 auto;
+  padding: 0 0 0 0;
+  box-sizing: border-box;
+  border: 1px solid #ccc;
+  text-align: center; }
+  .shopping-cart ul.head {
+    display: flex;
+    padding: 20px 10px;
+    margin: 0;
+    background-color: #f9f9f9;
+    justify-content: flex-start; }
+    .shopping-cart ul.head li.item {
+      list-style-type: none;
+      flex-grow: 1;
+      align-items: flex-start; }
+  .shopping-cart div.desc {
+    border-bottom: 1px solid #f9f9f9; }
+    .shopping-cart div.desc ul.body {
+      display: flex;
+      padding: 20px 0;
+      justify-content: space-around; }
+      .shopping-cart div.desc ul.body p.item-check {
+        width: 3px;
+        height: 3px;
+        display: inline-block;
+        padding: 2px;
+        background-color: #fff;
+        border: 1px solid #000;
+        border-radius: 3px; }
+        .shopping-cart div.desc ul.body p.item-check:hover {
+          background-color: #ffc520; }
+      .shopping-cart div.desc ul.body .checked {
+        background-color: #ffc520 !important; }
+      .shopping-cart div.desc ul.body li.item {
+        list-style-type: none;
+        flex-grow: 1;
+        align-items: flex-start; }
+        .shopping-cart div.desc ul.body li.item a {
+          text-decoration: none; }
+      .shopping-cart div.desc ul.body li.item-image img {
+        width: 60px;
+        height: 60px; }
+      .shopping-cart div.desc ul.body li.item-num input {
+        width: 30px; }
+      .shopping-cart div.desc ul.body li.item-num a {
+        text-decoration: none;
+        display: inline-block;
+        width: 15px;
+        height: 15px;
+        border-radius: 7.5px;
+        background-color: #ccc;
+        line-height: 15px;
+        text-align: center;
+        margin: 0 10px; }
+        .shopping-cart div.desc ul.body li.item-num ahover {
+          background-color: #d7d7d7; }
+    .shopping-cart div.desc ul.donation {
+      text-align: left; }
+      .shopping-cart div.desc ul.donation li.part {
+        list-style-type: none; }
+        .shopping-cart div.desc ul.donation li.part span {
+          text-align: left; }
+  .shopping-cart div.total {
+    padding: 30px 40px; }
+    .shopping-cart div.total div.choose {
+      float: left;
+      margin-right: 20px; }
+      .shopping-cart div.total div.choose > span {
+        cursor: pointer; }
+      .shopping-cart div.total div.choose span.item-check {
+        width: 3px;
+        height: 3px;
+        display: inline-block;
+        padding: 2px;
+        background-color: #fff;
+        border: 1px solid #000;
+        border-radius: 3px; }
+        .shopping-cart div.total div.choose span.item-check:hover {
+          background-color: #ffc520; }
+      .shopping-cart div.total div.choose .checked {
+        background-color: #ffc520 !important; }
+      .shopping-cart div.total div.choose span.item-check {
+        width: 3px;
+        height: 3px;
+        display: inline-block;
+        padding: 2px;
+        background-color: #fff;
+        border: 1px solid #000;
+        border-radius: 3px; }
+        .shopping-cart div.total div.choose span.item-check:hover {
+          background-color: #ffc520; }
+      .shopping-cart div.total div.choose .checked {
+        background-color: #ffc520 !important; }
+    .shopping-cart div.total div.totalMenoy {
+      float: right; }
+    .shopping-cart div.total .clearfix {
+      height: 0;
+      display: block;
+      clear: both;
+      visibility: hidden; }
+
+.hide-background {
+  display: none;
+  position: fixed;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background-color: rgba(91, 100, 81, 0.58); }
+  .hide-background .del-box {
+    width: 250px;
+    height: 200px;
+    position: absolute;
+    top: calc(50% - 100px);
+    left: calc(50% - 125px);
+    background-color: #fff;
+    padding: 10px 20px;
+    text-align: center; }
+    .hide-background .del-box .del {
+      position: relative;
+      left: 50%;
+      display: inline-block;
+      padding: 0 20px;
+      font-size: 24px;
+      cursor: pointer; }
+      .hide-background .del-box .del:hover {
+        -webkit-transform: rotateZ(90deg);
+        -moz-transform: rotateZ(90deg);
+        -ms-transform: rotateZ(90deg);
+        -o-transform: rotateZ(90deg);
+        transform: rotateZ(90deg);
+        -webkit-transition: all .5s;
+        -moz-transition: all .5s;
+        -ms-transition: all .5s;
+        -o-transition: all .5s;
+        transition: all .5s; }
+    .hide-background .del-box .ok, .hide-background .del-box .no {
+      display: inline-block;
+      width: 40%;
+      height: 25px;
+      margin-top: 30px;
+      text-align: center;
+      background-color: wheat;
+      cursor: pointer; }
+
+.show {
+  display: block !important; }
+
+.cursor {
+  cursor: pointer; }
+
+/*# sourceMappingURL=style.css.map */
