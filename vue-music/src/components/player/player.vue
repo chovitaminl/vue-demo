@@ -42,23 +42,23 @@
             <span class="dot"></span>
           </div>
           <div class="progress-wrapper">
-            <span class="time time-l"></span>
+            <span class="time time-l">{{this.format(this.currentTime)}}</span>
             <div class="progress-bar-wrapper">
-
+              <progress-bar :percent="percent" @percentChange="songTimeChange(percent)"></progress-bar>
             </div>
-            <span class="time time-r"></span>
+            <span class="time time-r">{{this.format(currentSong.duration)}}</span>
           </div>
           <div class="operators">
             <div class="icon i-left">
               <i class="icon-random"></i>
             </div>
-            <div class="icon i-left">
+            <div class="icon i-left" :class="disableCls">
               <i @click="prev" class="icon-prev"></i>
             </div>
-            <div class="icon i-center">
+            <div class="icon i-center" :class="disableCls">
               <i @click="togglePlay" :class="playIcon"></i>
             </div>
-            <div class="icon i-right">
+            <div class="icon i-right" :class="disableCls">
               <i @click="next" class="icon-next"></i>
             </div>
             <div class="icon i-right">
@@ -74,7 +74,7 @@
            v-show="!fullScreen">
         <div class="mini-lt">
           <div class="icon">
-            <img :src="currentSong.image" width="55" height="55" alt="">
+            <img :src="currentSong.image" width="55" height="55" alt="" :class="cdCls">
           </div>
           <div class="text">
             <div class="name" v-html="currentSong.name"></div>
@@ -91,27 +91,38 @@
         </div>
       </div>
     </transition>
-    <audio ref="audio" :src="currentSong.url" @canplay="readyPlay" @error="error"></audio>
+    <audio ref="audio" :src="currentSong.url"
+           @canplay="readyPlay"
+           @ended="ended"
+           @error="error"
+           @timeupdate="timeUpdate"></audio>
   </div>
 </template>
 <script type="text/ecmascript-6">
   import { mapGetters, mapMutations } from 'vuex'
   import animations from 'create-keyframe-animation'
   import { prefixStyle } from 'common/js/dom'
+  import progressBar from 'base/progress-bar/progress-bar'
 
   const transform = prefixStyle('transform')
 
   export default {
     data () {
       return {
-        canPlayFlag: false
+        canPlayFlag: false,
+        currentTime: 0
       }
     },
     methods: {
       readyPlay () {
         this.canPlayFlag = true
       },
-      error () {},
+      error () {
+        this.canPlayFlag = true
+      },
+      ended () {
+        this.setPlayingState(false)
+      },
       prev () {
         if (!this.canPlayFlag) {
           return
@@ -193,6 +204,30 @@
         this.$refs.cdWrapper.style.transition = ''
         this.$refs.cdWrapper.style[transform] = ''
       },
+      songTimeChange (percent) {
+        console.log(this.currentSong.duration * percent, this.$refs.audio)
+        const currentTime = this.currentSong.duration * percent
+        this.$refs.audio.currentTime = currentTime
+        if (!this.playing) {
+          this.togglePlay()
+        }
+      },
+      timeUpdate (e) {
+        this.currentTime = e.target.currentTime | 0
+      },
+      format (interval) {
+        let minute = interval / 60 | 0
+        let second = this._pad(interval % 60)
+        return `${minute}:${second}`
+      },
+      _pad (num, n = 2) {
+        let len = num.toString().length
+        while (len < n) {
+          num = '0' + num
+          len++
+        }
+        return num
+      },
       _getPosAndScale () {
         const targetWidth = 55
         const paddingLeft = 40
@@ -215,11 +250,17 @@
       })
     },
     computed: {
+      percent () {
+        return this.currentTime / this.currentSong.duration
+      },
       playIcon () {
         return this.playing ? 'icon-play' : 'icon-pause'
       },
       playIconMin () {
         return this.playing ? 'icon-play-mini' : 'icon-pause-mini'
+      },
+      disableCls () {
+        return this.canPlayFlag ? '' : 'disable'
       },
       cdCls () {
         return this.playing ? 'play' : 'play pause'
@@ -244,6 +285,9 @@
           newPlaying ? audio.play() : audio.pause()
         })
       }
+    },
+    components: {
+      progressBar
     }
   }
 </script>
@@ -284,6 +328,7 @@
       .top
         position: relative
         margin-bottom: 25px
+        z-inde: 100
         .back
           position: absolute
           top: 0
@@ -315,6 +360,7 @@
         bottom: 170px
         white-space: nowrap
         font-size: 0
+        z-inde: 100
         .middle-l
           display: inline-block
           vertical-align: top
@@ -373,6 +419,7 @@
         position: absolute
         bottom: 50px
         width: 100%
+        z-inde: 100
         .dot-wrapper
           text-align: center
           font-size: 0
