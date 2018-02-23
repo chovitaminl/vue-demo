@@ -44,13 +44,13 @@
           <div class="progress-wrapper">
             <span class="time time-l">{{this.format(this.currentTime)}}</span>
             <div class="progress-bar-wrapper">
-              <progress-bar :percent="percent" @percentChange="songTimeChange(percent)"></progress-bar>
+              <progress-bar :percent="percent" @percentChange="songTimeChange"></progress-bar>
             </div>
             <span class="time time-r">{{this.format(currentSong.duration)}}</span>
           </div>
           <div class="operators">
-            <div class="icon i-left">
-              <i class="icon-random"></i>
+            <div class="icon i-left" @click="changeMode">
+              <i :class="modeIcon"></i>
             </div>
             <div class="icon i-left" :class="disableCls">
               <i @click="prev" class="icon-prev"></i>
@@ -83,7 +83,9 @@
         </div>
         <div class="mini-rt">
           <div class="control">
-            <i @click.stop="togglePlay" :class="playIconMin"></i>
+            <progressCircle :radius="progressCircleRadius" :percent="percent">
+              <i @click.stop="togglePlay" class="icon-mini" :class="playIconMin"></i>
+            </progressCircle>
           </div>
           <div class="control">
             <i class="icon-playlist"></i>
@@ -102,7 +104,10 @@
   import { mapGetters, mapMutations } from 'vuex'
   import animations from 'create-keyframe-animation'
   import { prefixStyle } from 'common/js/dom'
+  import { playMode } from 'common/js/config'
+  import { shuffle } from 'common/js/util'
   import progressBar from 'base/progress-bar/progress-bar'
+  import progressCircle from 'base/progress-circle/progress-circle'
 
   const transform = prefixStyle('transform')
 
@@ -110,10 +115,22 @@
     data () {
       return {
         canPlayFlag: false,
-        currentTime: 0
+        currentTime: 0,
+        progressCircleRadius: 32
       }
     },
     methods: {
+      changeMode () {
+        const mode = (this.mode + 1) % 3
+        this.setPlayMode(mode)
+        let list = null
+        if (this.mode === playMode.random) {
+          list = shuffle(this.sequenceList)
+        } else {
+          list = this.sequenceList
+        }
+        this.setPlayList(list)
+      },
       readyPlay () {
         this.canPlayFlag = true
       },
@@ -205,7 +222,6 @@
         this.$refs.cdWrapper.style[transform] = ''
       },
       songTimeChange (percent) {
-        console.log(this.currentSong.duration * percent, this.$refs.audio)
         const currentTime = this.currentSong.duration * percent
         this.$refs.audio.currentTime = currentTime
         if (!this.playing) {
@@ -246,12 +262,17 @@
       ...mapMutations({
         setFullScreen: 'SET_FULL_SCREEN',
         setPlayingState: 'SET_PLAYING_STATE',
-        setCurrentIndex: 'SET_CURRENT_INDEX'
+        setCurrentIndex: 'SET_CURRENT_INDEX',
+        setPlayMode: 'SET_MODE',
+        setPlayList: 'SET_PLAYLIST'
       })
     },
     computed: {
       percent () {
         return this.currentTime / this.currentSong.duration
+      },
+      modeIcon () {
+        return this.mode === playMode.sequence ? 'icon-sequence' : this.mode === playMode.loop ? 'icon-loop' : 'icon-random'
       },
       playIcon () {
         return this.playing ? 'icon-play' : 'icon-pause'
@@ -269,8 +290,10 @@
         'fullScreen',
         'currentSong',
         'playlist',
+        'sequenceList',
         'playing',
-        'currentIndex'
+        'currentIndex',
+        'mode'
       ])
     },
     watch: {
@@ -287,7 +310,8 @@
       }
     },
     components: {
-      progressBar
+      progressBar,
+      progressCircle
     }
   }
 </script>
