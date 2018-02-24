@@ -56,7 +56,6 @@ export function getSongKeyInfo (songmid) {
   axios.get(url, {
     param: data
   }).then((res) => {
-    console.log('songl', res)
     return Promise.resolve(res.data)
   })
 }

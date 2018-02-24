@@ -103,6 +103,7 @@
 <script type="text/ecmascript-6">
   import { mapGetters, mapMutations } from 'vuex'
   import animations from 'create-keyframe-animation'
+  import lyricParser from 'lyric-parser'
   import { prefixStyle } from 'common/js/dom'
   import { playMode } from 'common/js/config'
   import { shuffle } from 'common/js/util'
@@ -116,10 +117,17 @@
       return {
         canPlayFlag: false,
         currentTime: 0,
-        progressCircleRadius: 32
+        progressCircleRadius: 32,
+        currentLyric: null
       }
     },
     methods: {
+      getLyric () {
+        this.currentSong.getLyric().then((lyric) => {
+          this.currentLyric = new lyricParser(lyric)
+          console.log('lt', this.currentLyric)
+        })
+      },
       changeMode () {
         const mode = (this.mode + 1) % 3
         this.setPlayMode(mode)
@@ -129,7 +137,14 @@
         } else {
           list = this.sequenceList
         }
+        this.resetCurrentIndex(list)
         this.setPlayList(list)
+      },
+      resetCurrentIndex (list) {
+        let index = list.findIndex((item) => {
+          return item.id === this.currentSong.id
+        })
+        this.setCurrentIndex(index)
       },
       readyPlay () {
         this.canPlayFlag = true
@@ -138,7 +153,16 @@
         this.canPlayFlag = true
       },
       ended () {
-        this.setPlayingState(false)
+        // this.setPlayingState(false)
+        if (this.mode === playMode.loop) {
+          this.loop()
+        } else {
+          this.next()
+        }
+      },
+      loop () {
+        this.$refs.audio.currentTime = 0
+        this.$refs.audio.play()
       },
       prev () {
         if (!this.canPlayFlag) {
@@ -181,7 +205,6 @@
         this.setFullScreen(true)
       },
       enter (el, done) {
-        console.log('enter', el, done)
         const {x, y, scale} = this._getPosAndScale()
         let animation = {
           0: {
@@ -205,19 +228,16 @@
         animations.runAnimation(this.$refs.cdWrapper, 'move', done)
       },
       afterEnter (el) {
-        console.log('afterenter', el)
         animations.unregisterAnimation('move')
         this.$refs.cdWrapper.style.animation = ''
       },
       leave (el, done) {
-        console.log('leave', el, done)
         this.$refs.cdWrapper.style.transition = 'all 0.4s'
         const {x, y, scale} = this._getPosAndScale()
         this.$refs.cdWrapper.style[transform] = `translate3d(${x}px,${y}px,0) scale(${scale})`
         this.$refs.cdWrapper.addEventListener('transitionend', done)
       },
       afterLeave (el) {
-        console.log('afterLeave', el)
         this.$refs.cdWrapper.style.transition = ''
         this.$refs.cdWrapper.style[transform] = ''
       },
@@ -297,9 +317,13 @@
       ])
     },
     watch: {
-      currentSong () {
+      currentSong (newSong, oldSong) {
+        if (newSong.id === oldSong.id) {
+          return
+        }
         this.$nextTick(() => {
           this.$refs.audio.play()
+          this.getLyric()
         })
       },
       playing (newPlaying) {

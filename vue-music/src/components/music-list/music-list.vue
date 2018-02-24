@@ -11,7 +11,7 @@
          ref="bgImage"
     >
       <div class="play-wrapper" ref="playBtn">
-        <div class="play">
+        <div class="play" @click="random">
           <i class="icon-play"></i>
           <span class="text">随机播放全部</span>
         </div>
@@ -106,6 +106,11 @@
       }
     },
     methods: {
+      random () {
+        this.randomPlay({
+          list: this.songs
+        })
+      },
       goBack () {
         this.$router.back()
       },
@@ -120,7 +125,8 @@
         })
       },
       ...mapActions([
-        'selectPlay'
+        'selectPlay',
+        'randomPlay'
       ])
     },
     created () {

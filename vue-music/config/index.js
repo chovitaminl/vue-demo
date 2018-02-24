@@ -30,6 +30,16 @@ module.exports = {
         headers: {
           referer: 'https://y.qq.com/portal/player.html'
         }
+      },
+      '/api/getLyric': {
+        target: 'https://c.y.qq.com',
+        changeOrigin: true,
+        pathRewrite: {
+          '/api/getLyric': '/lyric/fcgi-bin/fcg_query_lyric_new.fcg'
+        },
+        headers: {
+          referer: 'https://y.qq.com/portal/player.html'
+        }
       }
     },
 
