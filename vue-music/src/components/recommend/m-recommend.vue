@@ -1,5 +1,5 @@
 <template>
-  <div class="g-recommend">
+  <div class="g-recommend" ref="recommend">
     <scroll ref="scroll" class="g-recommend-content" :data="dissList">
       <div>
         <div class="g-slider" v-if="recommends.length">
@@ -34,8 +34,10 @@
   import Loading from 'base/loading/loading'
   import { getRecommend, getDissList } from 'api/recommend'
   import { ERR_OK } from 'api/config'
+  import { playlistMixin } from 'common/js/mixin'
 
   export default {
+    mixins: [playlistMixin],
     components: {
       Slider,
       Scroll,
@@ -52,6 +54,11 @@
       this._getDissList()
     },
     methods: {
+      handlePlaylist (playlist) {
+        const bottom = playlist.length > 0 ? '60px' : ''
+        this.$refs.recommend.style.bottom = bottom
+        this.$refs.scroll.refresh()
+      },
       _getRecommend () {
         getRecommend().then((res) => {
           if (res.code === ERR_OK) {
@@ -63,7 +70,6 @@
         getDissList().then((res) => {
           if (res.code === ERR_OK) {
             this.dissList = res.data.list
-            console.log('dissList', this.dissList)
           }
         })
       },

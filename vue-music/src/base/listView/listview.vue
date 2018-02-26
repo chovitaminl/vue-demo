@@ -1,5 +1,5 @@
 <template>
-  <scroll class="list-view" 
+  <scroll class="list-view"
           :data="data"
           :probeType="probeType"
           ref="listView"
@@ -7,14 +7,14 @@
           @scroll="scroll"
   >
     <ul>
-      <li class="list-group" 
+      <li class="list-group"
           v-for="(group, index) in data"
           :key="index"
-          ref="listGroup" 
+          ref="listGroup"
       >
         <h2 class="list-group-title">{{group.title}}</h2>
         <ul>
-          <li class="list-group-item g-flex" 
+          <li class="list-group-item g-flex"
               v-for="(singer, index) in group.items"
               :key="index"
               @click="selectSinger(singer)"
@@ -25,7 +25,7 @@
         </ul>
       </li>
     </ul>
-    <div class="list-shortcut" 
+    <div class="list-shortcut"
           @touchstart="onShortcutTouchStart"
           @touchmove.stop.prevent="onShortcutTouchMove"
     >
@@ -92,6 +92,9 @@
       }
     },
     methods: {
+      refresh () {
+        this.$refs.listView.refresh()
+      },
       selectSinger (singer) {
         this.$emit('select', singer)
       },
