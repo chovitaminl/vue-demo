@@ -102,7 +102,7 @@
 <style lang="stylus" rel="stylesheet/stylus">
   .g-singer
     position: fixed
-    top: 88px
+    top: 90px
     bottom: 0px
     width: 100%
 </style>

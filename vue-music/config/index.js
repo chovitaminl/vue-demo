@@ -18,7 +18,8 @@ module.exports = {
             '/api/getDiscLists':'/splcloud/fcgi-bin/fcg_get_diss_by_tag.fcg'
         },
         headers: {
-          referer: 'https://y.qq.com/portal/playlist.html'
+          referer: 'https://y.qq.com/portal/playlist.html',
+          host: 'c.y.qq.com'
         }
       },
       '/api/getSongKey': {

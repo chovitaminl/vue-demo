@@ -13,7 +13,11 @@
         </div>
         <div class="g-recommend-list">
           <h1 class="g-list-title s-list-title text-center">热门歌单推荐</h1>
-          <div class="g-item g-flex" v-for="(item,index) in dissList" :key="index">
+          <div class="g-item g-flex" 
+              v-for="(item, index) in dissList" 
+              :key="index"
+              @click="selectRecommend(item)"
+          >
             <img class="g-icon" v-lazy="item.imgurl" alt=""/>
             <div class="g-text g-flex">
               <div class="name" v-html="item.creator.name"></div>
@@ -26,6 +30,7 @@
         <loading v-show="!dissList.length"></loading>
       </div>
     </scroll>
+    <router-view></router-view>
   </div>
 </template>
 <script type="text/ecmascript-6">
@@ -35,6 +40,7 @@
   import { getRecommend, getDissList } from 'api/recommend'
   import { ERR_OK } from 'api/config'
   import { playlistMixin } from 'common/js/mixin'
+  import { mapMutations } from 'vuex'
 
   export default {
     mixins: [playlistMixin],
@@ -54,10 +60,19 @@
       this._getDissList()
     },
     methods: {
+      ...mapMutations({
+        setDisc: 'SET_DISC'
+      }),
       handlePlaylist (playlist) {
         const bottom = playlist.length > 0 ? '60px' : ''
         this.$refs.recommend.style.bottom = bottom
         this.$refs.scroll.refresh()
+      },
+      selectRecommend (diss) {
+        this.$router.push({
+          path: `/recommend/${diss.dissid}`
+        })
+        this.setDisc(diss)
       },
       _getRecommend () {
         getRecommend().then((res) => {
@@ -88,7 +103,7 @@
   .g-recommend
     position: fixed
     width: 100%
-    top: 88px
+    top: 90px
     bottom: 0
     .g-recommend-content
       height: 100%

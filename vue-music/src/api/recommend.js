@@ -65,3 +65,26 @@ export function getDissList () {
     return Promise.resolve(res.data)
   })
 }
+
+/**
+ * 获取推荐歌单详情数据
+ * @param disstid
+ */
+export function getRecommendSong (disstid) {
+  const url = 'https://c.y.qq.com/qzone/fcg-bin/fcg_ucc_getcdinfo_byids_cp.fcg'
+  const data = Object.assign({}, commonParams, {
+    type: 1,
+    json: 1,
+    utf8: 1,
+    onlysong: 0,
+    disstid,
+    g_tk: 460436641,
+    loginUin: 0,
+    hostUin: 0,
+    inCharset: 'utf8',
+    platform: 'yqq',
+    needNewCode: 0
+  })
+
+  return jsonp(url, data, options)
+}
