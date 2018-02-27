@@ -41,7 +41,6 @@
     },
     computed: {
       title () {
-        console.log(this.disc)
         return this.disc.dissname
       },
       bgImage () {
