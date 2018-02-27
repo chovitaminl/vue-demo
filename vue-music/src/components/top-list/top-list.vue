@@ -1,6 +1,6 @@
 <template>
   <transition name="slide">
-    <music-list :songs="songs" :title="title" :bg-image="bgImage"></music-list>
+    <music-list :songs="songs" :title="title" :bg-image="bgImage" :rank="rank"></music-list>
   </transition>
 </template>
 <script typy="text/ecmascript-6">
@@ -19,7 +19,8 @@
     },
     data () {
       return {
-        songs: []
+        songs: [],
+        rank: true
       }
     },
     methods: {
@@ -46,11 +47,14 @@
     },
     computed: {
       title () {
-        console.log(this.topList)
         return this.topList.topTitle
       },
       bgImage () {
-        return this.songs[0].image
+        let image = this.topList.picUrl
+        if (this.songs.length) {
+          image = this.songs[0].image
+        }
+        return image
       },
       ...mapGetters([
         'topList'
@@ -59,8 +63,9 @@
   }
 </script>
 <style scroped lang="stylus" rel="sheetstyle/stylus">
-  .slide-enter-active,.slide-leave-active
+  .slide-enter-active, .slide-leave-active
     transition: all 0.3s
-  .slide-enter,.slide-leave-to
-    transform: translate3d(100%, 0 ,0)
+
+  .slide-enter, .slide-leave-to
+    transform: translate3d(100%, 0, 0)
 </style>

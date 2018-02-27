@@ -28,7 +28,9 @@
     >
       <div class="g-singer-list">
         <song-list @select="selectItem"
-                   :songs="songs"></song-list>
+                   :songs="songs"
+                   :rank="rank"
+        ></song-list>
       </div>
       <div class="loading-container" v-show="!this.songs.length">
         <loading></loading>
@@ -66,6 +68,10 @@
       bgImage: {
         type: String,
         default: 'http://www.twicetech.top/wp-content/uploads/2017/09/missing.png'
+      },
+      rank: {
+        type: Boolean,
+        default: false
       }
     },
     data () {

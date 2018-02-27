@@ -6,7 +6,9 @@
           v-for="(song, index) in songs"
           :key="index"
           v-show="songs.length">
-        <div class="song-rank"></div>
+        <div class="song-rank" v-show="rank">
+          <span :class="getRankCls(index)" v-text="getRankText(index)"></span>
+        </div>
         <div class="song-content">
           <h2 class="song-name">{{song.name}}</h2>
           <p class="song-desc">{{getDesc(song)}}</p>
@@ -28,6 +30,20 @@
       }
     },
     methods: {
+      getRankCls (index) {
+        let cls
+        if (index <= 2) {
+          cls = `icon icon${index}`
+        } else {
+          cls = 'text'
+        }
+        return cls
+      },
+      getRankText (index) {
+        if (index > 2) {
+          return index + 1
+        }
+      },
       getDesc (song) {
         return `${song.singer}·${song.album}`
       },
@@ -37,7 +53,7 @@
     }
   }
 </script>
-<style  lang="stylus" rel="stylesheet/stylus">
+<style lang="stylus" rel="stylesheet/stylus">
   @import "~common/stylus/variable"
   @import "~common/stylus/mixin"
   .song-list
@@ -47,11 +63,25 @@
       box-sizing: border-box
       height: 64px
       font-size: $font-size-medium
-      .rank
-        display: inline-block
+      .song-rank
+        flex: 0 0 25px
         width: 25px
-        height: 24px
-        background-size: 25px 24px
+        margin-right: 30px
+        text-align: center
+        .icon
+          display: inline-block
+          width: 25px
+          height: 24px
+          background-size: 25px 24px
+          &.icon0
+            bg-image('first')
+          &.icon1
+            bg-image('second')
+          &.icon2
+            bg-image('third')
+        .text
+          color: $color-theme
+          font-size: $font-size-large
     .song-content
       flex: 1
       line-height: 20px
