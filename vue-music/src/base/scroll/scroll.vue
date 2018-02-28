@@ -27,6 +27,10 @@
       refreshDelay: {
         type: Number,
         default: 20
+      },
+      pullup: {
+        type: Boolean,
+        default: false
       }
     },
     mounted () {
@@ -47,6 +51,13 @@
           this.scroll.on('scroll', (pos) => {
             let me = this
             me.$emit('scroll', pos)
+          })
+        }
+        if (this.pullup) {
+          this.scroll.on('scrollEnd', () => {
+            if (this.scroll.y <= this.scroll.maxScrollY + 50) {
+              this.$emit('scrollToEnd')
+            }
           })
         }
       },

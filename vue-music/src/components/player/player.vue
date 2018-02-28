@@ -40,6 +40,7 @@
                    ref="lyricLine"
                    v-for="(line, index) in currentLyric.lines"
                    v-html="line.txt"
+                   :key="index"
                 ></p>
               </div>
             </div>
