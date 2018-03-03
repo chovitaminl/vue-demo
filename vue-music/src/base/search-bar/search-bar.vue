@@ -1,43 +1,50 @@
 <template>
   <div class="search-bar-warpper">
     <i class="icon icon-search"></i>
-    <input type="text" 
-    class="search-box"
-    :placeholder="placeholder"
-    v-model="query">
-    <i class="icon icon-delete" 
-        v-show="query"
-        @click="clearQuery"
+    <input type="text"
+           class="search-box"
+           :placeholder="placeholder"
+           v-model="query">
+    <i class="icon icon-delete"
+       v-show="query"
+       @click="clearQuery"
     ></i>
   </div>
 </template>
 <script type="text/ecmascript-6">
-export default {
-  props: {
-    placeholder: {
-      type: String,
-      default: '搜索歌曲、歌手'
-    }
-  },
-  data () {
-    return {
-      query: ''
-    }
-  },
-  methods: {
-    getQueryContent (hotKey) {
-      this.query = hotKey
+  import { debounce } from 'common/js/debounce'
+
+  export default {
+    props: {
+      placeholder: {
+        type: String,
+        default: '搜索歌曲、歌手'
+      }
     },
-    clearQuery () {
-      this.query = ''
+    data () {
+      return {
+        query: ''
+      }
+    },
+    methods: {
+      getQueryContent (hotKey) {
+        this.query = hotKey
+      },
+      clearQuery () {
+        this.query = ''
+      }
+    },
+    created () {
+      this.$watch('query', debounce((newQuery) => {
+        this.$emit('query', newQuery)
+      }))
     }
-  },
-  watch: {
-    query () {
-      this.$emit('query', this.query)
-    }
+//    watch: {
+//      query () {
+//        this.$emit('query', this.query)
+//      }
+//    }
   }
-}
 </script>
 <style lang="stylus" scoped>
   @import '~common/stylus/variable';

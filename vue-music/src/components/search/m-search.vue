@@ -11,9 +11,9 @@
     <div class="search-hotkey-warpper" v-show="!query">
       <h2 class="hotkey-title">热门搜索</h2>
       <ul class="hotkey-tag-content">
-        <li class="hotkey-tag" 
+        <li class="hotkey-tag"
         @click="selectHotKey(key.k)"
-        v-for="(key, index) in hotKeys" 
+        v-for="(key, index) in hotKeys"
         :key="index"
         >{{key.k}}</li>
       </ul>
@@ -24,6 +24,7 @@
         <span class="icon icon-clear"></span>
       </h2>
     </div>
+    <router-view></router-view>
   </div>
 </template>
 <script type="text/ecmascript-6">
