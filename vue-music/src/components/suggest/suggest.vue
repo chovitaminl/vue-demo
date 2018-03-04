@@ -2,7 +2,9 @@
   <scroll class="g-suggest"
           :data="suggests"
           :pullup="pullup"
+          :beforeScroll="beforeScroll"
           @scrollToEnd="searchMore"
+          @beforeScroll="listScroll"
   >
     <ul class="suggest-list">
       <li class="suggest-item"
@@ -51,10 +53,14 @@
         page: 1,
         suggests: [],
         pullup: true,
+        beforeScroll: true,
         hasMore: true
       }
     },
     methods: {
+      listScroll () {
+        this.$emit('listScroll')
+      },
       selectItem (item) {
         if (item.type === TYPE_SINGER) {
           const singer = new Singer({

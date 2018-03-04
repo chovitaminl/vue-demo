@@ -1,5 +1,5 @@
 <template>
-  <div class="search-bar-warpper">
+  <div class="search-bar-wrapper" ref="query">
     <i class="icon icon-search"></i>
     <input type="text"
            class="search-box"
@@ -12,7 +12,7 @@
   </div>
 </template>
 <script type="text/ecmascript-6">
-  import { debounce } from 'common/js/debounce'
+  import { debounce } from 'common/js/util'
 
   export default {
     props: {
@@ -27,6 +27,9 @@
       }
     },
     methods: {
+      blur () {
+        this.$refs.query.blur()
+      },
       getQueryContent (hotKey) {
         this.query = hotKey
       },
@@ -37,7 +40,7 @@
     created () {
       this.$watch('query', debounce((newQuery) => {
         this.$emit('query', newQuery)
-      }))
+      }, 200))
     }
 //    watch: {
 //      query () {
@@ -47,9 +50,9 @@
   }
 </script>
 <style lang="stylus" scoped>
-  @import '~common/stylus/variable';
+  @import '~common/stylus/variable'
 
-  .search-bar-warpper
+  .search-bar-wrapper
     position relative
     display: flex
     justify-content: center

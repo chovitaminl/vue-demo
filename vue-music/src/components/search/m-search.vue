@@ -6,16 +6,17 @@
       </div>
     </div>
     <div class="search-suggest-wrapper" v-show="query">
-      <suggest :query="query" :zhida="1"></suggest>
+      <suggest @listScroll="blurInput" :query="query" :zhida="1"></suggest>
     </div>
     <div class="search-hotkey-warpper" v-show="!query">
       <h2 class="hotkey-title">热门搜索</h2>
       <ul class="hotkey-tag-content">
         <li class="hotkey-tag"
-        @click="selectHotKey(key.k)"
-        v-for="(key, index) in hotKeys"
-        :key="index"
-        >{{key.k}}</li>
+            @click="selectHotKey(key.k)"
+            v-for="(key, index) in hotKeys"
+            :key="index"
+        >{{key.k}}
+        </li>
       </ul>
     </div>
     <div class="search-history-wrapper" v-show="!query">
@@ -44,6 +45,9 @@
       }
     },
     methods: {
+      blurInput () {
+        this.$refs.searchBar.blur()
+      },
       onChangeQuery (query) {
         this.query = query
       },
@@ -78,7 +82,7 @@
   }
 </script>
 <style lang="stylus" rel="stylesheet/stylus">
-  @import '~common/stylus/variable';
+  @import "~common/stylus/variable"
   .g-search
     position fixed
     top: 90px
