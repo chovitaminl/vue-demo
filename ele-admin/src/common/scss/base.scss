@@ -1,0 +1,32 @@
+@import "./variable.scss";
+
+body, html {
+  margin: 0;
+  font-family: 'PingFang SC', 'STHeitiSC-Light', 'Helvetica-Light', arial, sans-serif, 'Droid Sans Fallback';
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+  background: $color-background;
+  color: $color-text;
+}
+
+.g-flex{
+  display :flex;
+}
+
+.text-left{
+  text-align :left
+}
+
+.text-center{
+  text-align :center
+}
+
+.text-right{
+  text-align :right
+}
+
+a{
+  color: #7e8c8d;
+  -webkit-backface-visibility: hidden;
+}
+

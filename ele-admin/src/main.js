@@ -4,6 +4,9 @@ import Vue from 'vue'
 import App from './App'
 import router from './router'
 import attachFastClick from 'fastclick'
+import '@/common/scss/index.scss'
+// import elementUI from 'element-ui'
+// Vue.use(elementUI)
 import {
   Col,
   Row,
@@ -16,13 +19,11 @@ import {
   Menu,
   MenuItem,
   MenuItemGroup,
+  Container,
   Header,
   Footer,
   Aside,
   Main} from 'element-ui'
-
-attachFastClick.attach(document.body)
-
 Vue.config.productionTip = false
 Vue.use(Col)
 Vue.use(Row)
@@ -35,10 +36,14 @@ Vue.use(DropdownMenu)
 Vue.use(Menu)
 Vue.use(MenuItem)
 Vue.use(MenuItemGroup)
+Vue.use(Container)
 Vue.use(Header)
 Vue.use(Footer)
 Vue.use(Aside)
 Vue.use(Main)
+
+attachFastClick.attach(document.body)
+
 /* eslint-disable no-new */
 new Vue({
   el: '#app',

@@ -1,22 +1,28 @@
 <template>
-  <div id="app">
-    <router-view/>
-  </div>
+  <el-container class="is-vertical">
+    <admin-header></admin-header>
+    <el-container>
+      <sidebar></sidebar>
+      <admin-layout></admin-layout>
+    </el-container>
+  </el-container>
 </template>
 
 <script>
+import adminHeader from 'components/header/header'
+import Sidebar from 'components/sidebar/sidebar'
+import adminLayout from 'components/layout/layout'
+
 export default {
-  name: 'App'
+  name: 'App',
+  components: {
+    adminHeader,
+    Sidebar,
+    adminLayout
+  }
 }
 </script>
 
-<style>
-#app {
-  font-family: 'Avenir', Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  color: #2c3e50;
-  margin-top: 60px;
-}
+<style lang="scss" rel="stylesheet/scss" scoped>
+
 </style>
