@@ -1,6 +1,8 @@
 <template>
   <el-container class="is-vertical">
-    <el-main>container</el-main>
+    <el-main>
+      <h2>dsf</h2>
+    </el-main>
     <admin-footer></admin-footer>
   </el-container>
 </template>

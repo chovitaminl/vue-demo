@@ -76,21 +76,6 @@ module.exports = {
           limit: 10000,
           name: utils.assetsPath('fonts/[name].[hash:7].[ext]')
         }
-      },
-      {
-        test: /\.scss$/,
-        use: [
-          {loader: 'style-loader', options: {sourceMap: 'true'}},
-          {loader: 'css-loader', options: {sourceMap: 'true'}},
-          {loader: 'sass-loader', options: {sourceMap: 'true'}},
-          {
-            loader: 'sass-resources-loader',
-            options: {
-              sourceMap: 'true',
-              resources: [resolve('src/common/**/*.scss')]
-            }
-          },
-        ]
       }
     ]
   },
