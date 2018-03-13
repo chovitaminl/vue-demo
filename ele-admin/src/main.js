@@ -17,6 +17,7 @@ import {
   DropdownItem,
   DropdownMenu,
   Menu,
+  Submenu,
   MenuItem,
   MenuItemGroup,
   Container,
@@ -34,6 +35,7 @@ Vue.use(Dropdown)
 Vue.use(DropdownItem)
 Vue.use(DropdownMenu)
 Vue.use(Menu)
+Vue.use(Submenu)
 Vue.use(MenuItem)
 Vue.use(MenuItemGroup)
 Vue.use(Container)
