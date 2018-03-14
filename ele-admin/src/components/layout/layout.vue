@@ -1,7 +1,7 @@
 <template>
   <el-container class="is-vertical">
     <el-main>
-      <h2>dsf</h2>
+      <router-view></router-view>
     </el-main>
     <admin-footer></admin-footer>
   </el-container>
@@ -17,4 +17,9 @@ export default {
 }
 </script>
 <style lang="scss" rel="stylesheet/scss" scoped>
+.el-container{
+  .el-main{
+    position: relative;
+  }
+}
 </style>

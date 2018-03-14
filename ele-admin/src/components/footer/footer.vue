@@ -15,5 +15,9 @@ export default {
 }
 </script>
 <style lang="scss" rel="stylesheet/scss" scoped>
-
+.el-footer {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
 </style>

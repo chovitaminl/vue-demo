@@ -26,5 +26,8 @@ export default {
 <style lang="scss" rel="stylesheet/scss" scoped>
   .el-container.is-vertical{
     height: 100%;
+    .el-container{
+      height: 100%;
+    }
   }
 </style>

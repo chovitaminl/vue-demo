@@ -10,6 +10,9 @@ import '@/common/scss/index.scss'
 import {
   Col,
   Row,
+  Radio,
+  RadioGroup,
+  RadioButton,
   Breadcrumb,
   BreadcrumbItem,
   Tooltip,
@@ -28,6 +31,9 @@ import {
 Vue.config.productionTip = false
 Vue.use(Col)
 Vue.use(Row)
+Vue.use(Radio)
+Vue.use(RadioButton)
+Vue.use(RadioGroup)
 Vue.use(Breadcrumb)
 Vue.use(BreadcrumbItem)
 Vue.use(Tooltip)
