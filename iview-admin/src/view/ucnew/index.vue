@@ -10,7 +10,7 @@
 <template>
   <div class="uc-plan-wrapper">
     <!-- 步骤1 新建推广计划 -->
-    <plan @save-plan="planInfo"></plan>
+    <plan @save-plan="handlePlanInfo"></plan>
     <!-- 步骤2 新建推广单元 -->
     <unit :plan-info="planInfo"></unit>
     <!-- 步骤3 新建创意 -->
@@ -23,11 +23,10 @@ import plan from "./components/plan.vue";
 import unit from "./components/unit.vue";
 import idea from "./components/idea.vue";
 import Axios from "@/api/index";
-
 export default {
   data() {
     return {
-      // 获取从plan组件创建推广计划是传回的数据
+      // 从plan组件创建推广计划时传回的数据
       planInfo: {
         campaignId: "",
         campaignName: ""
@@ -35,7 +34,8 @@ export default {
     };
   },
   methods: {
-    planInfo(data) {
+    // 事件：获取从plan组件创建推广计划时传回的数据
+    handlePlanInfo(data) {
       this.planInfo.campaignId = data.campaign_id;
       this.planInfo.campaignName = data.campaign_name;
     },

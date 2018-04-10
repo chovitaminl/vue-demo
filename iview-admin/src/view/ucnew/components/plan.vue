@@ -20,20 +20,20 @@
       </Button>
 
       <Form :label-width="126" label-position="left">
-        <FormItem>
+        <FormItem v-if="!isEdit" class="border-import">
           <h3 slot="label" class="sub-title">导入推广计划</h3>
-          <Select @on-change="changeAdPlan" v-model="adCustomPlan.campaign_name" style="width:200px">
+          <Select @on-change="changeAdPlan" v-model="adCustomPlan.campaign_name" class="item-width">
             <Option v-for="(plan, index) in AdPlan" :value="plan" :key="index">{{plan}}</Option>
           </Select>
           <Button type="text" @click="clearPlanInfo">重置</Button>
         </FormItem>
       </Form>
 
-      <h3 class="sub-title border-top">推广计划设置</h3>
+      <h3 class="sub-title title-padding">推广计划设置</h3>
 
       <Form ref="adCustomPlan" :model="adCustomPlan" :label-width="126" label-position="left">
         <FormItem label="推广计划名称">
-          <Input v-model="adCustomPlan.campaign_name" :maxlength="30" placeholder="推广计划名称" class="item-width"></Input>
+          <Input @on-change="judgeLen" v-model="adCustomPlan.campaign_name" :maxlength="30" placeholder="推广计划名称" class="item-width"></Input>
           <span class="text-tip">最多30个字符，且不能包含特殊字符</span>
         </FormItem>
         <FormItem label="推广资源">
@@ -67,7 +67,8 @@
           </RadioGroup>
         </FormItem>
         <FormItem label="开始日期">
-          <DatePicker :value="adCustomPlan.startDate" type="date" :placeholder="adCustomPlan.startDate" class="item-width"></DatePicker>
+          <DatePicker :value="adCustomPlan.startDate" type="date" @on-change="changeStartDate" placeholder="请选择开始日期" class="item-width"></DatePicker>
+          <!-- <DatePicker v-model="adCustomPlan.startDate" type="date" format="yyyy-MM-dd" placeholder="请选择开始日期" class="item-width"></DatePicker> -->
         </FormItem>
         <FormItem label="结束日期">
           <RadioGroup v-model="adCustomPlan.endDate">
@@ -102,15 +103,16 @@
 
 <script>
 import Axios from "@/api/index";
-import { ERR_OK } from "@/api/config";
 import { deepClone } from "@/common/js/DateShortcuts";
 import weekDate from "@/components/week-date/index";
+// 本地测试代码
 import planList from "../simple/plan";
-
 const SET_END_DATE_UNLIMITED = "2099-01-01";
+const ERR_OK = 1;
 export default {
   data() {
     return {
+      isEdit: false, // 判断当前推广计划状态：true为编辑状态，false为新建状态
       AdPlan: [], // 推广计划名称（campaign_name）
       adPlanList: [], // 推广计划数据
       adPlanListCopy: [],
@@ -122,6 +124,7 @@ export default {
       endDate: this._getStartDate(), // 客户设置的结束时间
       adCustomPlan: {
         // 新建推广计划参数
+        account_id: 123456789,
         campaign_name: "",
         adResourceId: 1,
         budget: "-1",
@@ -135,6 +138,7 @@ export default {
         saturday: "111111111111111111111111",
         sunday: "111111111111111111111111"
       },
+      paused: true, // 推广计划开启状态，用于编辑推广计划提交数据
       weekTimeModal: false, // 控制weekTIme 弹窗
       // 推广时间段
       period: [
@@ -148,13 +152,52 @@ export default {
       ],
       // 获取新建推广计划id
       planInfo: {
-        campaignId: '',
-        campaignName: ''
-      }, 
-      accountId: "207326436"
+        campaignId: "",
+        campaignName: ""
+      }
     };
   },
   methods: {
+    // 判断字符长度
+    judgeLen() {
+      let currStr = this.adCustomPlan.campaign_name;
+      let isSpecial = this.judgeSpecial(currStr);
+      if (isSpecial) {
+        this.adCustomPlan.campaign_name = "";
+        this.$Message.error("不能输入特殊字符");
+      }
+      console.log(isSpecial)
+      let currLen = this.getByteLen(currStr);
+      if (currLen === 30) {
+        console.log(currLen, currStr)
+        this.$Message.error("最大输入不能超过30个字符");
+        this.adCustomPlan.campaign_name = currStr;
+      }
+    },
+    // 匹配特殊字符，含有返回true
+    judgeSpecial(str) {
+      let pattern = new RegExp(
+        "[`~!@#$^&*()=|{}':;',\\[\\].<>/?~！@#￥……&*（）——|{}【】‘；：”“'。，、？]"
+      );
+      if (pattern.exec(str)) {
+        return true;
+      } else {
+        return false;
+      }
+    },
+    // 获取字符长度
+    getByteLen(str) {
+      let len = 0;
+      for (let i = 0; i < str.length; i++) {
+        let char = str.charAt(i);
+        if (char.match(/[^\x00-\xff]/gi) !== null) {
+          len += 2;
+        } else {
+          len += 1;
+        }
+      }
+      return len;
+    },
     // 获取推广计划数据
     getAdPlan() {
       let ret = [];
@@ -162,6 +205,57 @@ export default {
         ret.push(plan.campaign_name);
       });
       this.AdPlan = ret;
+    },
+    updateCampaign() {
+      let params = Object.assign({}, this.adCustomPlan, {
+        paused: this.paused,
+        action: "ucAdPut",
+        opt: "updateCampaign",
+        do: "edit",
+        appId: "",
+        platform: "",
+        campaign_id: this.planInfo.campaignId,
+        budget: this.adCustomPlan.budget.toString()
+      });
+      console.log("paramsxxxx", params);
+      Axios.post("api.php", params)
+        .then(res => {
+          if (ERR_OK === res.ret) {
+            this.planInfo.campaignId = res.data.campaign_id;
+            this.$Message.success("编辑成功");
+          }
+        })
+        .catch(err => {
+          console.log("编辑推广计划" + err);
+        });
+    },
+    addCampaign() {
+      let update = Object.assign({}, this.adCustomPlan, {
+        action: "ucAdPut",
+        opt: "addCampaign",
+        do: "edit",
+        appId: "",
+        platform: "",
+        budget: this.adCustomPlan.budget.toString()
+      });
+      console.log("add this.adCustomPlan", this.adCustomPlan, update);
+      // Axios.post("api.php", update)
+      //   .then(res => {
+      //     if (ERR_OK === res.ret) {
+      //       this.planInfo.campaignId = res.data.campaign_id;
+      //       this.planInfo.campaignName = this.adCustomPlan.campaign_name;
+      //       this.$emit("save-plan", this.planInfo);
+      //       this.$Message.success("提交成功");
+      //     }
+      //   })
+      //   .catch(err => {
+      //     console.log("新建推广计划" + err);
+      //   });
+
+      // 本地测试代码
+      this.planInfo.campaignId = "this.adCustomPlan.account_id";
+      this.planInfo.campaignName = this.adCustomPlan.campaign_name;
+      this.$emit("save-plan", this.planInfo);
     },
     // 投放时间弹窗的on-ok事件，获取同步的推广时间段
     handleWeekTime() {
@@ -172,33 +266,14 @@ export default {
       this.adCustomPlan.friday = this.period[4];
       this.adCustomPlan.saturday = this.period[5];
       this.adCustomPlan.sunday = this.period[6];
-      console.log("this.period change", this.adCustomPlan, this.period);
     },
     // 提交推广计划
-    handleSumbit(name) {
-      let update = Object.assign(this.adCustomPlan, {
-        action: "ucAdPut",
-        opt: "addCampaign",
-        do: "edit",
-        account_id: this.accountId,
-        appId: "",
-        platform: ""
-      });
-      // Axios.post("api.php", update)
-      //   .then(res => {
-      //     if (ERR_OK === res.ret) {
-      //       this.$Message.success("提交成功");
-      // this.planInfo.campaignId = res.data.campaign_id;
-      // this.planInfo.campaignName = this.adCustomPlan.campaign_name;
-      // this.$emit("save-plan", this.planInfo);
-      //     }
-      //   })
-      //   .catch(err => {
-      //     console.log("新建推广计划" + err);
-      //   });
-      this.planInfo.campaignId = 'res.data.campaign_id';
-      this.planInfo.campaignName = this.adCustomPlan.campaign_name;
-      this.$emit("save-plan", this.planInfo);
+    handleSumbit() {
+      if (this.isEdit) {
+        this.updateCampaign();
+      } else {
+        this.addCampaign();
+      }
     },
     // 弹窗控制
     handlerWeekTime() {
@@ -208,6 +283,9 @@ export default {
     getEndDate(date) {
       this.endDate = date;
       this.adCustomPlan.endDate = date;
+    },
+    changeStartDate(date) {
+      this.adCustomPlan.startDate = date;
     },
     // 获取当前计划日预算
     getbudget(budget) {
@@ -225,23 +303,24 @@ export default {
     },
     // 获取推广计划的同步数据
     campaignPlan() {
+      // 本地测试代码
       this.adPlanList = planList.data;
       this.adPlanListCopy = deepClone(this.adPlanList);
       this.getAdPlan();
-      // Axios.post('api.php', {
-      //   action: 'ucAdPut',
-      //   opt: 'getCampaignsList'
+      // Axios.post("api.php", {
+      //   action: "ucAdPut",
+      //   opt: "getCampaignsList"
       // })
       //   .then(res => {
       //     if (ERR_OK === res.ret) {
       //       this.adPlanList = res.data;
-      //       console.log(this.adPlanList);
       //       this.adPlanListCopy = deepClone(this.adPlanList);
       //       this.getAdPlan();
+      //       this.$Message.success("推广计划数据更新成功");
       //     }
       //   })
       //   .catch(err => {
-      //     console.log('获取推广计划错误：' + err);
+      //     console.log("获取推广计划错误：" + err);
       //   });
     },
     // "导入推广计划" select组件的change事件
@@ -249,7 +328,6 @@ export default {
       this.adPlanList.forEach(plan => {
         if (campaignName === plan.campaign_name) {
           let budget = plan.budget;
-          console.log("plan", plan);
           this.adCustomPlan.campaign_name = plan.campaign_name;
           this.adCustomPlan.adResourceId = parseInt(plan.adResourceId);
           this.budgetCustom = typeof budget === "-1" ? 100 : parseInt(budget);
@@ -266,11 +344,45 @@ export default {
       this.$router.go(-1);
     },
     // 获取account id
-    getAccountId() {
+    getAccountInfo() {
       const query = this.$route.query;
-      if (query.account_id) {
-        this.accoundId = query.account_id;
+      const params = this.$route.params;
+
+      /**
+       * 进入plan页面时，如果accountId 为空则字节返回上一级路由
+       * 在上线前为了方便测试，所以先隐藏
+       */
+      // if (!(typeof query === 'number') && !query.account_id ) {
+      //   this.$router.go(-1);
+      // }
+      console.log("show query", query);
+      console.log("show params", params);
+
+      if (typeof query === "object" && params.account_id) {
+        this.adCustomPlan.account_id = params.account_id;
+        this.adCustomPlan.adResourceId = parseInt(params.adResourceId);
+        this.adCustomPlan.campaign_name = params.campaign_name;
+        this.adCustomPlan.budget =
+          typeof params.budget === "string"
+            ? params.budget
+            : parseInt(params.budget);
+        this.adCustomPlan.startDate = params.startDate;
+        this.adCustomPlan.endDate = params.endDate;
+        this.adCustomPlan.monday = params.schedule.monday;
+        this.adCustomPlan.tuesday = params.schedule.tuesday;
+        this.adCustomPlan.wednesday = params.schedule.wednesday;
+        this.adCustomPlan.thursday = params.schedule.thursday;
+        this.adCustomPlan.friday = params.schedule.friday;
+        this.adCustomPlan.saturday = params.schedule.saturday;
+        this.adCustomPlan.sunday = params.schedule.sunday;
+        this.paused = params.paused;
+        this.planInfo.campaignId = params.campaign_id;
+        this.isEdit = true;
+      } else {
+        this.adCustomPlan.account_id = query;
+        this.isEdit = false;
       }
+      console.log("isEdit", this.isEdit);
     },
     // 获取
     _norimalizeWeekDayStatus(list) {
@@ -302,7 +414,7 @@ export default {
     }
   },
   mounted() {
-    this.getAccountId();
+    this.getAccountInfo();
   },
   computed: {
     getEndDateStatus() {
@@ -321,7 +433,6 @@ export default {
     }
   },
   created() {
-    console.log(planList);
     this.campaignPlan();
   },
   components: {
