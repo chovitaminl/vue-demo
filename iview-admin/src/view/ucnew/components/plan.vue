@@ -22,10 +22,10 @@
       <Form :label-width="126" label-position="left">
         <FormItem v-if="!isEdit" class="border-import">
           <h3 slot="label" class="sub-title">导入推广计划</h3>
-          <Select @on-change="changeAdPlan" v-model="adCustomPlan.campaign_name" class="item-width">
+          <Select @on-change="handleChangeAdPlan" v-model="adCustomPlan.campaign_name" class="item-width">
             <Option v-for="(plan, index) in AdPlan" :value="plan" :key="index">{{plan}}</Option>
           </Select>
-          <Button type="text" @click="clearPlanInfo">重置</Button>
+          <Button type="text" @click="handleClearPlanInfo">重置</Button>
         </FormItem>
       </Form>
 
@@ -57,26 +57,26 @@
           </RadioGroup>
         </FormItem>
         <FormItem label="日预算">
-          <RadioGroup v-model="adCustomPlan.budget">
-            <Radio :label="budgetUnlimited">
+          <RadioGroup @on-change="handleChangeBudget" v-model="budgetStatus">
+            <Radio label="0">
               <span>不限</span>
             </Radio>
-            <Radio :label="budgetCustom" v-model="budgetCustom" :true-value="budgetCustom">
-              <InputNumber @on-change="getbudget" v-model="budgetCustom" :min="100" :max="100000" :step="100" placeholder="100" :disabled="getBudgetStatus" class="item-width"></InputNumber>元
+            <Radio label="1">
+              <InputNumber @on-focus="handleBudget" v-model="adCustomPlan.budget" :min="100" :max="100000" :precision="2" :step="100" placeholder="100" :disabled="isDisableBudget" class="item-width"></InputNumber>元
             </Radio>
           </RadioGroup>
         </FormItem>
         <FormItem label="开始日期">
-          <DatePicker :value="adCustomPlan.startDate" type="date" @on-change="changeStartDate" placeholder="请选择开始日期" class="item-width"></DatePicker>
+          <DatePicker  @on-change="changeStartDate" :value="adCustomPlan.startDate" type="date" placeholder="请选择开始日期" class="item-width"></DatePicker>
           <!-- <DatePicker v-model="adCustomPlan.startDate" type="date" format="yyyy-MM-dd" placeholder="请选择开始日期" class="item-width"></DatePicker> -->
         </FormItem>
         <FormItem label="结束日期">
-          <RadioGroup v-model="adCustomPlan.endDate">
-            <Radio :label="dateUnlimited">
+          <RadioGroup @on-change="handleChangeEndDate" v-model="endDateStatus">
+            <Radio label="0">
               <span>不限</span>
             </Radio>
-            <Radio :label="endDate" v-model="endDate" :true-value="endDate">
-              <DatePicker @on-change="getEndDate" type="date" placeholder="请选择结束日期" :disabled="getEndDateStatus" class="item-width"></DatePicker>
+            <Radio label="1">
+              <DatePicker @on-change="handleEndDate" :value="adCustomPlan.endDate" type="date" placeholder="请选择结束日期" :disabled="isDisableEndDate" class="item-width"></DatePicker>
             </Radio>
           </RadioGroup>
         </FormItem>
@@ -118,16 +118,16 @@ export default {
       adPlanListCopy: [],
       importPlanName: "",
       adResourceId: [1, 2], // 默认推广资源
-      budgetUnlimited: "-1", // 默认日预算
-      budgetCustom: 100, // 客户设置的日预算
-      dateUnlimited: SET_END_DATE_UNLIMITED, // 不限时结束时间
-      endDate: this._getStartDate(), // 客户设置的结束时间
+      budgetStatus: "0", // 日预算状态：不限为0，自定义为1
+      isDisableBudget: true, // 日预算状态，禁止为true，自定义为false
+      endDateStatus: "0", // 结束日期状态：不限为0，自定义为1
+      isDisableEndDate: true, // 结束日期状态，禁止为true，自定义为false
       adCustomPlan: {
         // 新建推广计划参数
         account_id: 123456789,
         campaign_name: "",
         adResourceId: 1,
-        budget: "-1",
+        budget: 0,
         startDate: this._getStartDate(),
         endDate: SET_END_DATE_UNLIMITED,
         monday: "111111111111111111111111",
@@ -166,10 +166,10 @@ export default {
         this.adCustomPlan.campaign_name = "";
         this.$Message.error("不能输入特殊字符");
       }
-      console.log(isSpecial)
+      console.log(isSpecial);
       let currLen = this.getByteLen(currStr);
       if (currLen === 30) {
-        console.log(currLen, currStr)
+        console.log(currLen, currStr);
         this.$Message.error("最大输入不能超过30个字符");
         this.adCustomPlan.campaign_name = currStr;
       }
@@ -257,6 +257,28 @@ export default {
       this.planInfo.campaignName = this.adCustomPlan.campaign_name;
       this.$emit("save-plan", this.planInfo);
     },
+    // 监听结束时间按钮
+    handleChangeEndDate(endDateSwitch) {
+      switch (endDateSwitch) {
+        case "0":
+          this.isDisableEndDate = true;
+          this.adCustomPlan.endDate = SET_END_DATE_UNLIMITED;
+          break;
+        case "1":
+          this.isDisableEndDate = false;
+          this.adCustomPlan.endDate = this._getStartDate();
+          break;
+      }
+    },
+    // 监听自定义结束时间
+    handleEndDate(date) {
+      this.isDisableEndDate = false;
+      this.endDateStatus = "1";
+      this.adCustomPlan.endDate = date;
+    },
+    changeStartDate(date) {
+      this.adCustomPlan.startDate = date;
+    },
     // 投放时间弹窗的on-ok事件，获取同步的推广时间段
     handleWeekTime() {
       this.adCustomPlan.monday = this.period[0];
@@ -279,27 +301,54 @@ export default {
     handlerWeekTime() {
       this.weekTimeModal = true;
     },
-    // 获取当前计划结束时间
-    getEndDate(date) {
-      this.endDate = date;
-      this.adCustomPlan.endDate = date;
+    // 监听日预算开关按钮
+    handleChangeBudget(budgetSwitch) {
+      switch (budgetSwitch) {
+        case "0":
+          this.isDisableBudget = true;
+          this.adCustomPlan.budget = -1;
+          break;
+        case "1":
+          this.isDisableBudget = false;
+          this.adCustomPlan.budget = 0;
+          break;
+      }
     },
-    changeStartDate(date) {
-      this.adCustomPlan.startDate = date;
-    },
-    // 获取当前计划日预算
-    getbudget(budget) {
-      this.budgetCustom = budget;
-      this.adCustomPlan.budget = budget;
+    // 监听日预算操作
+    handleBudget(budgetNum) {
+      this.isDisableBudget = false;
+      this.budgetStatus = "1";
+      this.adCustomPlan.budget = budgetNum;
     },
     // "导入推广计划"的重置计划事件按钮
-    clearPlanInfo() {
+    handleClearPlanInfo() {
       this.adCustomPlan.campaign_name = "";
       this.adCustomPlan.adResourceId = 1;
-      this.adCustomPlan.budget = "-1";
+      this.adCustomPlan.budget = -1;
+      this.isDisableBudget = true;
+      this.budgetStatus = "0";
       this.adCustomPlan.startDate = this._getStartDate();
       this.adCustomPlan.endDate = SET_END_DATE_UNLIMITED;
       this.adPlanListCopy = deepClone(this.adPlanList);
+    },
+    // "导入推广计划" select组件的change事件
+    handleChangeAdPlan(campaignName) {
+      this.adPlanList.forEach(plan => {
+        if (campaignName === plan.campaign_name) {
+          this.adCustomPlan.campaign_name = plan.campaign_name;
+          this.adCustomPlan.adResourceId = parseInt(plan.adResourceId);
+          let budget = plan.budget;
+          this.budgetStatus = budget === "-1" ? "0" : "1";
+          this.isDisableBudget = budget === "-1" ? true : false;
+          this.adCustomPlan.budget = parseInt(budget);
+          this.adCustomPlan.startDate = plan.startDate;
+          this.isDisableEndDate = plan.endDate === SET_END_DATE_UNLIMITED ? true : false;
+          this.endDateStatus = plan.endDate === SET_END_DATE_UNLIMITED ? "0" : "1";
+          this.adCustomPlan.endDate = plan.endDate;
+          this._norimalizeWeekDayStatus(JSON.parse(plan.schedule));
+          this.handleWeekTime();
+        }
+      });
     },
     // 获取推广计划的同步数据
     campaignPlan() {
@@ -322,22 +371,6 @@ export default {
       //   .catch(err => {
       //     console.log("获取推广计划错误：" + err);
       //   });
-    },
-    // "导入推广计划" select组件的change事件
-    changeAdPlan(campaignName) {
-      this.adPlanList.forEach(plan => {
-        if (campaignName === plan.campaign_name) {
-          let budget = plan.budget;
-          this.adCustomPlan.campaign_name = plan.campaign_name;
-          this.adCustomPlan.adResourceId = parseInt(plan.adResourceId);
-          this.budgetCustom = typeof budget === "-1" ? 100 : parseInt(budget);
-          this.adCustomPlan.budget = budget;
-          this.adCustomPlan.startDate = plan.startDate;
-          this.adCustomPlan.endDate = plan.endDate;
-          this._norimalizeWeekDayStatus(JSON.parse(plan.schedule));
-          this.handleWeekTime();
-        }
-      });
     },
     // 返回计划列表按钮
     goBack() {
@@ -415,22 +448,6 @@ export default {
   },
   mounted() {
     this.getAccountInfo();
-  },
-  computed: {
-    getEndDateStatus() {
-      if (this.dateUnlimited === this.adCustomPlan.endDate) {
-        return true;
-      } else if (this.budgetUnlimited !== this.adCustomPlan.endDate) {
-        return false;
-      }
-    },
-    getBudgetStatus() {
-      if (this.budgetUnlimited === this.adCustomPlan.budget) {
-        return true;
-      } else if (this.budgetUnlimited !== this.adCustomPlan.budget) {
-        return false;
-      }
-    }
   },
   created() {
     this.campaignPlan();
