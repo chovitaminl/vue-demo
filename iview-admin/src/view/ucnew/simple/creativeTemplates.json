@@ -1,0 +1,116 @@
+{
+  "ret": 1,
+  "msg": "succ",
+  "data": [
+    {
+      "adgroup_id": "30837813",
+      "creativeTemplateId": "5",
+      "creativeTemplateName": "信息流小图下载",
+      "creativeTemplateFields": [
+        {
+          "key": "app_name",
+          "alias": "APP名称",
+          "tips": "APP名称字符范围为2-20"
+        },
+        {
+          "key": "title",
+          "alias": "标题",
+          "tips": "标题字符范围为10-45"
+        },
+        {
+          "key": "source",
+          "alias": "推广来源",
+          "tips": "推广来源字符范围为1-16"
+        },
+        {
+          "key": "pic1_img",
+          "alias": "图片",
+          "tips": "jpg/png格式,尺寸140*105，图片大小不能超过20kb"
+        },
+        {
+          "key": "scheme_url",
+          "alias": "直达链接",
+          "tips": "长度不能大于1024个字符"
+        }
+      ]
+    },
+    {
+      "adgroup_id": "30837813",
+      "creativeTemplateId": "4",
+      "creativeTemplateName": "信息流大图下载",
+      "creativeTemplateFields": [
+        {
+          "key": "app_name",
+          "alias": "APP名称",
+          "tips": "APP名称字符范围为2-20"
+        },
+        {
+          "key": "title",
+          "alias": "标题",
+          "tips": "标题字符范围为10-70"
+        },
+        {
+          "key": "source",
+          "alias": "推广来源",
+          "tips": "推广来源字符范围为1-16"
+        },
+        {
+          "key": "pic1_img",
+          "alias": "图片",
+          "tips":
+            "jpg/png格式,尺寸640*300，图片大小不能超过90kb"
+        },
+        {
+          "key": "scheme_url",
+          "alias": "直达链接",
+          "tips": "长度不能大于1024个字符"
+        }
+      ]
+    },
+    {
+      "adgroup_id": "30837813",
+      "creativeTemplateId": "34",
+      "creativeTemplateName": "三图下载",
+      "creativeTemplateFields": [
+        {
+          "key": "app_name",
+          "alias": "APP名称",
+          "tips": "APP名称字符范围为2-20"
+        },
+        {
+          "key": "title",
+          "alias": "标题",
+          "tips": "标题字符范围为10-70"
+        },
+        {
+          "key": "pic1_img",
+          "alias": "图片",
+          "tips":
+            "请上传160*120，大小不超过20kb图片，支持jpg/png"
+        },
+        {
+          "key": "pic2_img",
+          "alias": "图片",
+          "tips":
+            "请上传160*120，大小不超过20kb图片，支持jpg/png"
+        },
+        {
+          "key": "pic3_img",
+          "alias": "图片",
+          "tips":
+            "请上传160*120，大小不超过20kb图片，支持jpg/png"
+        },
+        {
+          "key": "source",
+          "alias": "推广来源",
+          "tips": "推广来源字符范围为1-16"
+        },
+        {
+          "key": "scheme_url",
+          "alias": "直达链接",
+          "tips": "长度不能大于1024个字符"
+        }
+      ]
+    }
+  ]
+}

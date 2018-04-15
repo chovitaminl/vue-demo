@@ -51,9 +51,28 @@
 }
 .interesting {
   .interest-item {
-    display: inline-block;
-    width: 270px;
+    float: left;
+    width: 260px;
   }
+  .interest-word-content {
+    position: relative;
+    width: 240px;
+    height: 270px;
+    border: 1px solid #ccc;
+    box-sizing: border-box;
+    .interest-tip {
+      position: absolute;
+      padding: 0 10px;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      height: 32px;
+      background-color: #e6e6e6;
+    }
+  }
+}
+.g-card .ivu-card-body {
+  padding: 0 16px;
 }
 </style>
 
@@ -68,10 +87,10 @@
           返回单元列表
         </Button>
         <!-- 导入推广单元 -->
-        <Form :label-width="126" label-position="left">
+        <Form v-if="!isEdit" :label-width="126" label-position="left">
           <FormItem class="border-import">
             <h3 slot="label" class="sub-title">导入推广单元</h3>
-            <Select @on-change="handleChangeImportPlan" v-model="unitSetting.campaign_name" :clearable="true" class="item-width">
+            <Select @on-change="handleChangeImportPlan" :clearable="true" class="item-width">
               <Option v-for="(plan, index) in importDate.planlist" :value="plan.campaign_name" :key="index.id">{{plan.campaign_name}}</Option>
             </Select>
             <Select @on-change="handleChangeImportUnit" v-model="unitAdgroupName" :clearable="true" class="item-width">
@@ -85,7 +104,7 @@
 
         <Form ref="unitSetting" :model="unitSetting" :label-width="126" label-position="left">
           <FormItem label="所属推广计划">
-            <p>{{ unitSetting.campaign_name }}</p>
+            <p>{{ campaign_name }}</p>
           </FormItem>
           <FormItem label="推广单元名称">
             <Input v-model="unitSetting.adgroup_name" :maxlength="30" placeholder="推广单元名称" class="item-width"></Input>
@@ -117,13 +136,13 @@
           <h3 class="sub-title color-green">定向设置</h3>
           </Col>
           <Col>
-          <Select @on-change="handleChangeTargeting" v-model="targetingSetting.targeting_name" :clearable="true" class="item-width">
+          <Select @on-change="handleChangeTargeting" :clearable="true" class="item-width">
             <Option v-for="(targeting, index) in targetingList" :value="targeting.targeting_name" :key="targeting.targeting_id">{{targeting.targeting_name}}</Option>
           </Select>
           </Col>
         </Row>
         <Form ref="targetingSetting" :model="targetingSetting" :label-width="126" label-position="left">
-          <FormItem label="自定义人群定向">
+          <!-- <FormItem label="自定义人群定向">
             <RadioGroup v-model="targetingSetting.audience_targeting">
               <Radio label="-1">不限</Radio>
               <Radio label="1">
@@ -155,7 +174,7 @@
                 </Tooltip>
               </Radio>
             </RadioGroup>
-          </FormItem>
+          </FormItem> -->
           <FormItem label="定向名称">
             <Input v-model="targetingSetting.targeting_name" :maxlength="30" placeholder="请输入定向名称" class="item-width"></Input>
             <span class="color-red">最多30个字符，且不能包含特殊字符</span>
@@ -206,28 +225,83 @@
               <Radio label="-1">不限</Radio>
               <Radio label="1">自定义</Radio>
             </RadioGroup>
-            <Tabs value="interestTargeting">
+            <Tabs v-if="targetingSetting.user_targeting === '1'" value="interestTargeting" :animated="false">
               <TabPane label="兴趣定向" name="interestTargeting">
                 <div class="interesting">
                   <div class="interest-item">
                     <type-tree @on-change="handleInterestCat" tree-title="兴趣分类" :tree-data="interestTreeList" :tips-text="interestCat"></type-tree>
                   </div>
                   <div class="interest-item">
-
+                    <h4 class="title">
+                      <Checkbox v-model="isInterestWord" :disabled="true">
+                        兴趣关键词
+                        <Tooltip placement="bottom" :transfer="true">
+                          <Icon type="help-circled"></Icon>
+                          <div slot="content">
+                            <p>请填写定向关键词，这些关键词可以</p>
+                            <p>与您的产品或业务相关，或者与您的</p>
+                            <p>目标用户相关。</p>
+                            <p>广告将定向展现给与所填关键词相关</p>
+                            <p>联的用户，比如用户曾经搜索过这些</p>
+                            <p>关键词或者浏览过与这些关键词有关</p>
+                            <p>的文章。</p>
+                            <p>每个单元中最多填写200个关键词，</p>
+                            <p>每个关键词长度不超过15个汉字或</p>
+                            <p>30个英文字符；填写时请注意，每</p>
+                            <p>个关键词占一行。</p>
+                          </div>
+                        </Tooltip>
+                      </Checkbox>
+                    </h4>
+                    <div class="interest-word-content">
+                      <Input @on-enter="handlerInterestWord" v-model="interestWord" type="textarea" :rows="11"></Input>
+                      <div class="interest-tip">已添加{{targetingSetting.word.length}}个，还可以添加{{200 -targetingSetting.word.length}}个。</div>
+                    </div>
                   </div>
                   <div class="interest-item">
+                    <h4 class="title">
+                      <Checkbox v-model="isInterestURL" :disabled="true">
+                        兴趣站点
+                        <Tooltip placement="bottom" :transfer="true">
+                          <Icon type="help-circled"></Icon>
+                          <div slot="content" style="max-width:580px">
+                            <p>填写定向URL，这些URL可以与您的产品或业务相关，或者与您的目标用户相关。</p>
+                            <p>广告将定向展现给与所填URL相关联的用户，比如用户曾经浏览这些网站。</p>
+                            <p>每个单元最多填写200个URL，填写时请注意，每个URL占一行，不要连同</p>
+                            <p>http://或https:// 一起填写。</p>
+                            <p>正确的URL示例：www.example.com 或者 site.example.com </p>
+                            <p>不正确的URL示例：http://www.example.com 或者</p>
+                            <p>https://www.example.com?id123456&p=123&PMTI4NTE0ODQ5NDU1OTM2NDBfOTIyMzM3MDU1M</p>
+                          </div>
+                        </Tooltip>
+                      </Checkbox>
+                    </h4>
+                    <div class="interest-word-content">
+                      <Input @on-enter="handlerInterestURL" v-model="interestURL" type="textarea" :rows="11"></Input>
+                      <div class="interest-tip">已添加{{targetingSetting.url.length}}个，还可以添加{{200 - targetingSetting.url.length}}个。</div>
+                    </div>
                   </div>
                 </div>
               </TabPane>
               <TabPane label="APP定向" name="APPTargeting">
                 <div class="interesting">
                   <div class="interest-item">
-                    <!-- <type-tree tree-title="游戏类" :tree-data=""></type-tree> -->
+                    <type-tree @on-change="handleInterestAPP" tree-title="游戏类" :tree-data="interestAPPGameTreeList" :interest-value="2"></type-tree>
                   </div>
                   <div class="interest-item">
-                    <!-- <type-tree tree-title="软件类" :tree-data=""></type-tree> -->
+                    <type-tree @on-change="handleInterestAPP" tree-title="软件类" :tree-data="interestAPPSFTreeList" :interest-value="1"></type-tree>
                   </div>
                   <div class="interest-item">
+                    <h4 class="title">
+                      <Checkbox v-model="isInterestURL" :disabled="true">
+                        APP名称
+                      </Checkbox>
+
+                    </h4>
+                    <div class="text-left">
+                      <Input v-model="interestSearch" clearable style="width: 200px"></Input>
+                      <Button type="ghost">搜索</Button>
+                    </div>
                   </div>
                 </div>
               </TabPane>
@@ -255,7 +329,7 @@
 
           </FormItem>
           <FormItem label="网络环境">
-            <RadioGroup v-model="targetingSetting.network_env">
+            <RadioGroup @on-change="handleNewWorkEnv" v-model="targetingSetting.network_env">
               <Radio label="11">不限</Radio>
               <Radio label="01">WiFi</Radio>
               <Radio label="10">数据网络</Radio>
@@ -277,13 +351,15 @@
             <Select @on-change="handleChangeConvertMonitorTypes" class="item-width">
               <Option v-for="(convertName, index) in convert.convertMonitorTypesList" :value="convertName.name" :key="index">{{convertName.name}}</Option>
             </Select>
-            <span class="color-red">目前仅提供Android下载完成数据</span>
+            <span v-if="convert.currConvertMonitorTypes && convert.currConvertMonitorTypes.name === '下载'" class="color-red">目前仅提供Android下载完成数据</span>
           </FormItem>
 
-          <FormItem v-if="Array.isArray(convert.convertList) && convert.convertList.length > 0 || convert.convertList === 'object' && convert.convertList.convertId" label="转化名称">
+          <FormItem v-if="convert.currConvertMonitorTypes && convert.currConvertMonitorTypes.name !== '下载'" label="转化名称">
             <Select @on-change="handleChangeConvertMonitorName" class="item-width">
               <Option v-for="(convertName, index) in convert.convertList" :value="convertName.name" :key="index">{{convertName.name}}</Option>
             </Select>
+            <span v-if="(convert.currConvertMonitorTypes && convert.currConvertMonitorTypes.name !== '下载' && convert.currConvertMonitorTypes.name !== '激活')" class="color-red">该账户的转化目标暂不可用,请跳转到
+              <a href="#">推广工具</a> 配置转化跟踪。</span>
           </FormItem>
           {{this.unitSetting}}
           <FormItem>
@@ -302,25 +378,25 @@
                 </div>
               </Tooltip>
             </p>
-            <RadioGroup v-model="unitSetting.optimizationTarget">
+            <RadioGroup @on-change="handleChangeOptimizationTarget" v-model="unitSetting.optimizationTarget">
               <Radio label="1">点击</Radio>
               <Radio label="2">展现</Radio>
-              <Radio label="3">转化</Radio>
+              <Radio v-if="(convert.currConvertMonitorTypes && convert.currConvertMonitorTypes.name === '下载') || (convert.currConvertMonitorTypes && convert.currConvertMonitorTypes.name === '激活')" label="3">转化</Radio>
             </RadioGroup>
-            <span class="color-red">优化目标转化仅支持Android；IOS和其他操作系统将采用第一阶段出价进行出价</span>
+            <span v-if="unitSetting.optimizationTarget === '3'" class="color-red">优化目标转化仅支持Android；IOS和其他操作系统将采用第一阶段出价进行出价</span>
           </FormItem>
           <FormItem label="计费方式">
-            <RadioGroup v-model="unitSetting.chargeType">
-              <Radio label="1">CPC</Radio>
-              <Radio label="2">CPM</Radio>
+            <RadioGroup @on-change="handleChangeChargeType" v-model="unitSetting.chargeType">
+              <Radio label="1" disabled>CPC</Radio>
+              <Radio label="2" disabled>CPM</Radio>
             </RadioGroup>
             <span class="color-red">计费方式保存后不可修改</span>
           </FormItem>
-          <FormItem label="出价">
-            <InputNumber :max="101" :min="0.50" :step="10" v-model="unitSetting.bid" :precision="2" class="item-width"></InputNumber>元/点击
+          <FormItem v-if="unitSetting.optimizationTarget !== '3'" label="出价">
+            <InputNumber @on-change="handleBid" :max="101" :min="0.50" :step="10" v-model="unitSetting.bid" :precision="2" class="item-width"></InputNumber>元/点击
             <span class="color-red">请输入0.50-101之间的数字，精确到小数点后2位，单元出价需小于预算。</span>
           </FormItem>
-          <FormItem>
+          <FormItem v-if="unitSetting.optimizationTarget === '3'">
             <p slot="label">第一阶段出价
               <Tooltip placement="top">
                 <Icon type="help-circled"></Icon>
@@ -331,10 +407,10 @@
                 </div>
               </Tooltip>
             </p>
-            <InputNumber :max="101" :min="0.50" :step="10" v-model="unitSetting.bid" :precision="2" class="item-width"></InputNumber>元/点击
+            <InputNumber @on-change="handleBid" :max="101" :min="0.50" :step="10" v-model="unitSetting.bid" :precision="2" class="item-width"></InputNumber>元/点击
             <span class="color-red">请输入0.50-101之间的数字，精确到小数点后2位，单元出价需小于预算。</span>
           </FormItem>
-          <FormItem>
+          <FormItem v-if="unitSetting.optimizationTarget === '3'">
             <p slot="label">第二阶段出价
               <Tooltip placement="top">
                 <Icon type="help-circled"></Icon>
@@ -347,19 +423,18 @@
                 </div>
               </Tooltip>
             </p>
-            <InputNumber :max="999.99" :min="1" :step="10" v-model="unitSetting.secondBid" :precision="2" class="item-width"></InputNumber>元/点击
+            <InputNumber @on-change="handleSecondBid" :max="999.99" :min="1" :step="10" v-model="unitSetting.secondBid" :precision="2" class="item-width"></InputNumber>元/点击
             <span class="color-red">请输入1-999.99之间的数字，精确到小数点后2位</span>
           </FormItem>
         </Form>
         <!-- 出价设置 -->
-        <h3 class="sub-title title-padding color-green">高级设置</h3>
-
+        <!-- <h3 class="sub-title title-padding color-green">高级设置</h3>
         <Form ref="priceSetting" :model="unitSetting" :label-width="126" label-position="left">
-          <!-- <RadioGroup v-model="">
-            <Radio label="">拨打电话样式</Radio>
-            <Radio label="">填写表单样式</Radio>
-          </RadioGroup> -->
-        </Form>
+          <RadioGroup v-model="unitSetting.unitType">
+            <Radio label="0">拨打电话样式</Radio>
+            <Radio label="2">填写表单样式</Radio>
+          </RadioGroup>
+        </Form> -->
 
         <Row class="btn-submit">
           <Col>
@@ -370,8 +445,8 @@
 
       </Card> -->
       </Col>
-      <Col span="3">
-      <Card style="background-color:#f0f0f0;" dis-hover>
+      <Col span="3" style="position:fixed;right:16px;top:0">
+      <Card style="background-color:#f0f0f0;" class="g-card" dis-hover>
         <h3 class="evaluate-title color-green">
           流量预估
           <Tooltip placement="top">
@@ -386,7 +461,7 @@
         </h3>
         <div class="evaluate-content">
           <h4 class="evaluate-subtitle">预计最大覆盖月活跃用户数：</h4>
-          <div class="evaluate-num color-green">{{evaluate.activeNum}}</div>
+          <div class="evaluate-num color-green">{{evaluate.activeTxt}}</div>
         </div>
         <div v-if="evaluate.platform" class="evaluate-content">
           <h4 class="evaluate-subtitle">操作系统：</h4>
@@ -410,6 +485,49 @@
             {{evaluate.ageTxt}}
           </div>
         </div>
+        <div v-if="this.evaluate.interestCatTxt.length > 0" class="evaluate-content">
+          <h4 class="evaluate-subtitle">兴趣定向-分类：</h4>
+          <div class="evaluate-text">
+            {{evaluate.interestCatTxt}}
+          </div>
+        </div>
+        <div v-if="this.evaluate.interestWordTxt.length > 0" class="evaluate-content">
+          <h4 class="evaluate-subtitle">兴趣定向-关键词：</h4>
+          <div class="evaluate-text">
+            {{evaluate.interestWordTxt}}
+          </div>
+        </div>
+        <div v-if="this.evaluate.interestURLTxt.length > 0" class="evaluate-content">
+          <h4 class="evaluate-subtitle">兴趣定向-站点：</h4>
+          <div class="evaluate-text">
+            {{evaluate.interestURLTxt}}
+          </div>
+        </div>
+        <div v-if="this.evaluate.interestAPPGameTxt.length > 0" class="evaluate-content">
+          <h4 class="evaluate-subtitle">APP定向-游戏类：</h4>
+          <div class="evaluate-text">
+            {{evaluate.interestAPPGameTxt}}
+          </div>
+        </div>
+        <div v-if="this.evaluate.interestAPPSFTxt.length > 0" class="evaluate-content">
+          <h4 class="evaluate-subtitle">APP定向-软件类：</h4>
+          <div class="evaluate-text">
+            {{evaluate.interestAPPSFTxt}}
+          </div>
+        </div>
+        <div v-if="this.evaluate.interestAPPNameTxt.length > 0" class="evaluate-content">
+          <h4 class="evaluate-subtitle">APP定向-APP名称：</h4>
+          <div class="evaluate-text">
+            {{evaluate.interestAPPNameTxt}}
+          </div>
+        </div>
+
+        <div v-if="this.evaluate.netWorkEnvTxt.length > 0" class="evaluate-content">
+          <h4 class="evaluate-subtitle">网络环境:</h4>
+          <div class="evaluate-text">
+            {{evaluate.netWorkEnvTxt}}
+          </div>
+        </div>
       </Card>
       </Col>
     </Row>
@@ -424,6 +542,9 @@ import targetingList from "../simple/targeting";
 import provincesList from "../simple/province";
 import interestList from "../simple/interest";
 import convertTypeList from "../simple/convertType";
+import getCampaignNameList from "../simple/getCampaignNameList";
+import interest from "../simple/interest";
+import unitbyid from "../simple/unitbyid";
 import typeTree from "./typeTree";
 import Axios from "@/api/index";
 const ERR_OK = 1;
@@ -431,25 +552,26 @@ export default {
   data() {
     return {
       isEdit: false, // 推广单页状态：true为编辑状态，false为新建状态
+      isTargetingSubmit: false, // 判断定向设置是否提交了。提交为true
       // 获取同步的 导入推广数据
       importDate: {
         planlist: {}, // 推广计划数据
         unitlist: {} // 推广单元数据
       },
       adgroupId: "", // 编辑时的推广单元id
+      campaign_name: "", // 推广计划名称
       // 自定义推广单元数据
       unitSetting: {
         account_id: "",
         adgroup_name: "", // 推广单元名称
-        campaign_id: 123456789, // 推广方式的id
-        campaign_name: "", // 推广计划名称
+        campaign_id: "", // 推广方式的id
         generalizeType: "1", // 推广方式
         adResourceId: 1, // 推广计划推广资源
         platform: "", // 操作系统
-        chargeType: 1, // 计费方式
+        chargeType: "1", // 计费方式
         bid: 0, // 出价
         secondBid: 0, // 第二阶段出价
-        adconvertId: "", // 	转化id
+        adconvertId: 0, // 	转化id
         convertMonitorType: -1, // 转化监测类型
         optimizationTarget: "1", // 优化目标
         unitType: 0 // pp应用推广类型
@@ -473,7 +595,7 @@ export default {
         word: [], // 关键关键词定向
         url: [], // 	兴趣站点定向
         app: [], // app名称定向
-        appcategory: 0, // app分类定向
+        appcategory: [], // app分类定向
         network_env: "11", // 	网络环境定向
         intelli_targeting: true, // 开启用户智能定向
         search_word: [], // 应用搜索关键词定向
@@ -484,10 +606,18 @@ export default {
       // 右侧数据统计
       evaluate: {
         activeNum: 100, // 流量估计活跃量
+        activeTxt: "",
         platform: "", // 操作系统数据
         provinceTxt: "", // 省市名称集合
         genderTxt: "", // 性别
-        ageTxt: "" // 年龄
+        ageTxt: "", // 年龄
+        interestCatTxt: "", //  兴趣定向 兴趣分类
+        interestWordTxt: "", //  兴趣定向 兴趣关键词
+        interestURLTxt: "", //  兴趣定向  兴趣站点
+        interestAPPGameTxt: "", // APP定向 游戏类
+        interestAPPSFTxt: "", // APP定向 软件类
+        interestAPPNameTxt: "", // APP定向 APP名称
+        netWorkEnvTxt: "" // 网络环境
       },
       provinceList: [], // 获取同步的 省市地域列表
       provinceTreeList: [], // 省市Tree组件数据
@@ -501,9 +631,18 @@ export default {
         "告将定向展现给与所选兴趣",
         "相关联的用户。"
       ], // 省市Tree组件数据 中 兴趣分类tip
+      interestAPPList: [], // 获取同步的 APP定向列表
+      interestAPPGameTreeList: [], // APP定向游戏Tree组件数据
+      interestAPPSFTreeList: [], // APP定向软件Tree组件数据
+      isInterestWord: false, // APP定向关键词状态
+      isInterestURL: false, // APP定向站点状态
+      interestWord: "", // APP定向关键词内容
+      interestURL: "", // APP定向URL内容
+      interestSearch: "", // APP定向search内容
       // 转化对象
       convert: {
         convertMonitorTypesList: [], // 获取同步的 转化类型列表
+        convertMonitorTypesListCopy: [], // 获取同步的 转化类型列表 副本
         currConvertMonitorTypes: {}, // 当前操作的转化类型对象数据
         convertList: [] // 获取同步的 转化列表
       }
@@ -512,12 +651,119 @@ export default {
   mounted() {
     this.UNIT_PLATFORM_ARGUTMENT = ["001", "010", "100"];
     this.UNIT_PLATFORM_NUM = [1, 10, 100];
-    this.getAccountInfo();
     this.$nextTick(() => {
-      this.getInterestTypes();
-      this.getConvertMonitorTypes();
       this.getProvince();
+      this.getConvertMonitorTypes();
+      this.getInterestTypes();
+      this.getInterestAPP();
+      this.getAccountInfo();
     });
+    // 根据id获取单元内容
+    Axios.post("api.php", {
+      action: "ucAdPut",
+      opt: "getAdgroupById",
+      adgroup_id: "30837813"
+    })
+      .then(res => {
+        console.log("res", res);
+        if (ERR_OK === res.ret) {
+          console.log("根据id获取单元内容", res.data);
+        }
+      })
+      .catch(err => {
+        console.log("获取单元内容数据错误：" + err);
+      });
+    // 根据id获取创意内容
+    Axios.post("api.php", {
+      action: "ucAdPut",
+      opt: "getCreativeById",
+      id: "1"
+    })
+      .then(res => {
+        console.log("res", res);
+        if (ERR_OK === res.ret) {
+          console.log("根据id获取创意内容", res.data);
+        }
+      })
+      .catch(err => {
+        console.log("获取创意内容数据错误：" + err);
+      });
+    // 获取广告样式列表
+    Axios.post("api.php", {
+      action: "ucAdPut",
+      opt: "getCreativeTemplates",
+      adgroup_id: "30837813"
+    })
+      .then(res => {
+        console.log("res", res);
+        if (ERR_OK === res.ret) {
+          console.log("获取广告样式列表", res.data);
+        }
+      })
+      .catch(err => {
+        console.log("获取广告样式列表错误：" + err);
+      });
+    // 根据id获取创意内容
+    Axios.post("api.php", {
+      action: "ucAdPut",
+      opt: "getCreativeById",
+      id: "1"
+    })
+      .then(res => {
+        console.log("根据id获取创意内容res", res);
+        if (ERR_OK === res.ret) {
+          console.log("根据id获取创意内容", res.data);
+        }
+      })
+      .catch(err => {
+        console.log("根据id获取创意内容错误：" + err);
+      });
+    // 获取计划名称列表
+    Axios.post("api.php", {
+      action: "ucAdPut",
+      opt: "getCampaignNameList"
+    })
+      .then(res => {
+        console.log("获取计划名称列表", res);
+        if (ERR_OK === res.ret) {
+          console.log("获取计划名称列表", res.data);
+        }
+      })
+      .catch(err => {
+        console.log("获取计划名称列表错误：" + err);
+      });
+    // 根据计划id获取单元名称列表
+    Axios.post("api.php", {
+      action: "ucAdPut",
+      opt: "getAdgroupNameList",
+      campaignids: [30441770]
+    })
+      .then(res => {
+        console.log("res", res);
+        if (ERR_OK === res.ret) {
+          console.log("根据计划id获取单元名称列表", res.data);
+        }
+      })
+      .catch(err => {
+        console.log("根据计划id获取单元名称列表错误：" + err);
+      });
+    // 更新推广单元名称
+    Axios.post("api.php", {
+      action: "ucAdPut",
+      opt: "updateAdgroupName",
+      account_id: "207326436",
+      adgroup_name: "\u68b5\u8482\u5188",
+      adgroup_id: "30837813"
+    })
+      .then(res => {
+        console.log("res", res);
+        if (ERR_OK === res.ret) {
+          console.log("更新推广单元名称", res.data);
+        }
+      })
+      .catch(err => {
+        console.log("更新推广单元名称错误：" + err);
+      });
   },
   created() {
     // init DATA
@@ -561,18 +807,23 @@ export default {
     },
     //  定向设置中自定义年龄的字符串转数组
     ageStrToArray(str) {
-      if (!str && str.length < 1) {
-        return;
-      }
-      const ageList = [">=50", "40-49", "30-39", "25-29", "19-24", "<=18"];
       let retArr = [];
-      let currStr = "";
-      ageList.forEach((age, index) => {
-        currStr = str.charAt(index);
-        if ("1" === currStr) {
-          retArr.push(age);
+      if (typeof str === "string") {
+        if (str === "") {
+          return retArr;
         }
-      });
+        const ageList = [">=50", "40-49", "30-39", "25-29", "19-24", "<=18"];
+        let currStr = "";
+        console.log("str.xxx", str);
+        ageList.forEach((age, index) => {
+          currStr = str.charAt(index);
+          if ("1" === currStr) {
+            retArr.push(age);
+          }
+        });
+      } else {
+        return [];
+      }
       return retArr;
     },
     //  定向设置中自定义年龄的数组转字符串
@@ -604,17 +855,9 @@ export default {
       let retStr = total.toString();
       console.log("platformArrToString", retStr, typeof retStr);
       if ("0" === retStr) {
-        return "000";
+        retStr = "000";
       }
-      if ("1" === retStr) {
-        return "001";
-      }
-      if ("11" === retStr) {
-        return "011";
-      }
-      if ("111" === retStr) {
-        return "111";
-      }
+      return retStr;
     },
     // 将字符串按照形式分割为数组（推广单元中操作系统的选项转换）
     platformStrToArray(str) {
@@ -645,15 +888,113 @@ export default {
       console.log("platformStrToArray", ret, typeof ret);
       return ret;
     },
+    // // 事件：监听兴趣APPSF
+    // handleInterestAPPSF(list) {
+    //   if (list.value > 0) {
+    //     this.targetingSetting.appcategory.push(list.value);
+    //   }
+    //   const app = [];
+    //   list.list.forEach(inter => {
+    //     if (inter.value) {
+    //       interest.push(inter.value);
+    //     }
+    //   });
+    //   this.targetingSetting.app = app;
+    //   console.log("事件：监听兴趣分类", list, this.targetingSetting.appcategory, this.targetingSetting.app)
+    // },
+    normalizeTxtShow(list, length) {
+      if (!Array.isArray(list)) {
+        return;
+      }
+      let retTxt = "";
+      if (list.length === "") {
+        return retTxt;
+      }
+      if (list.length < length) {
+        retTxt = list.slice().join("、");
+      } else {
+        retTxt = `${list.slice(0, length).join("、")}等${list.length}个`;
+      }
+      return retTxt;
+    },
+    // 事件：监听兴趣word
+    handlerInterestWord(word) {
+      this.targetingSetting.word.push(word.target.value);
+      this.evaluate.interestURLTxt = this.normalizeTxtShow(
+        this.targetingSetting.word,
+        3
+      );
+    },
+    // 事件：监听兴趣url
+    handlerInterestURL(url) {
+      this.targetingSetting.url.push(url.target.value);
+      this.evaluate.interestWordTxt = this.normalizeTxtShow(
+        this.targetingSetting.url,
+        3
+      );
+    },
+    // 事件：监听兴趣APP
+    handleInterestAPP(list) {
+      if (list.value > 0) {
+        this.targetingSetting.appcategory.push(list.value);
+      }
+      const app = [];
+      list.list.forEach(inter => {
+        if (inter.value) {
+          app.push(inter.value);
+        }
+      });
+      this.targetingSetting.app = app;
+      console.log(
+        "事件：监听兴趣APP",
+        list,
+        this.targetingSetting.appcategory,
+        this.targetingSetting.app
+      );
+    },
     // 事件：监听兴趣分类
     handleInterestCat(list) {
       const interest = [];
-      list.forEach(inter => {
+      list.list.forEach(inter => {
         if (inter.value) {
           interest.push(inter.value);
         }
       });
       this.targetingSetting.interest = interest;
+      console.log(
+        "事件：监听兴趣分类",
+        list,
+        this.targetingSetting.appcategory,
+        this.targetingSetting.interest
+      );
+    },
+    // 事件：监听第一出价
+    handleBid(bid) {
+      this.unitSetting.bid = bid;
+    },
+    // 事件：监听第二出价
+    handleSecondBid(secbid) {
+      this.unitSetting.secondBid = secbid;
+    },
+    // 事件：监听计费方式
+    handleChangeChargeType(chargeType) {},
+    // 事件：监听优化目标
+    handleChangeOptimizationTarget(optimizationTarget) {
+      const chargeType = ["1", "2"];
+      switch (optimizationTarget) {
+        case "1":
+          this.unitSetting.optimizationTarget = optimizationTarget;
+          this.unitSetting.chargeType = chargeType[0];
+          break;
+        case "2":
+          this.unitSetting.optimizationTarget = optimizationTarget;
+          this.unitSetting.chargeType = chargeType[1];
+          break;
+        case "3":
+          this.unitSetting.optimizationTarget = optimizationTarget;
+          this.unitSetting.chargeType = chargeType[1];
+          break;
+      }
     },
     // 事件：监听转化名称
     handleChangeConvertMonitorName(convertName) {
@@ -683,8 +1024,8 @@ export default {
       this.targetingSetting.age = currStr;
       // 处理右侧evaluate.ageTxt 的输出
       if (Array.isArray(ageList) && ageList.length > 0) {
-        let ageTxt = ageList.join("、");
-        this.evaluate.ageTxt = ageTxt.substring(0, ageTxt.length - 1);
+        let ageTxt = ageList.slice().join("、");
+        this.evaluate.ageTxt = ageTxt;
       }
     },
     // 事件：监听年龄数据
@@ -711,7 +1052,7 @@ export default {
     },
     // 事件：监听省市数据
     handleChangeProvinceTree(provinceList) {
-      if (!provinceList && provinceList.length < 1) {
+      if (provinceList.length < 1) {
         return;
       }
       let retName = [];
@@ -722,7 +1063,10 @@ export default {
         retValue.push(city.value);
       });
       this.targetingSetting.region = retValue;
-      if (retName.length > 3) {
+      if (retName === "") {
+        retTxt = "";
+        return;
+      } else if (retName.length > 3) {
         retTxt = `${retName[0]}、${retName[1]}、${retName[2]}...等${
           retName.length
         }个地域`;
@@ -773,10 +1117,28 @@ export default {
     // 事件：监听推广方式状态
     handleGeneralizeType(status) {
       if ("1" === status) {
+        this.convert.convertMonitorTypesList = this.convert.convertMonitorTypesListCopy.slice();
         this.isGeneralizePage = true;
       } else if ("2" === status) {
+        let list = this.convert.convertMonitorTypesListCopy.forEach(conv => {
+          if ("激活" === conv.name) {
+            let arr = [];
+            arr.push(conv);
+            this.convert.convertMonitorTypesList = arr;
+          }
+        });
         this.isGeneralizePage = false;
       }
+    },
+    // 事件：监听网络环境
+    handleNewWorkEnv(env) {
+      const enName = ["", "WIFI", "数据网络"];
+      const enKey = ["11", "01", "10"];
+      enKey.forEach((k, i) => {
+        if (k === env) {
+          this.evaluate.netWorkEnvTxt = enName[i];
+        }
+      });
     },
     // 事件：新建定向设置
     handleTargetingSumbit() {},
@@ -815,13 +1177,134 @@ export default {
         this.targetingAgeStatus,
         this.targetingSetting
       );
+      // 投放地域
+      if (this.targetingSetting.region.length > 0) {
+        const provinceList = [];
+        this.targetingSetting.region.forEach(region => {
+          this.provinceTreeList.forEach((vp, ip) => {
+            if (region === vp.value) {
+              vp.checked = true;
+              vp.expand = true;
+              provinceList.push(vp);
+            }
+            vp.children.forEach((vc, ic) => {
+              if (region === vc.value) {
+                vc.checked = true;
+                vc.expand = true;
+                provinceList.push(vc);
+              }
+            });
+          });
+        });
+        this.handleChangeProvinceTree(provinceList);
+      } else {
+        this.evaluate.provinceTxt = "";
+      }
+      // 兴趣与行为定向
+      let interestCatSelectedList = this.normalizeInterestTreeList(
+        this.targetingSetting.interest,
+        this.interestTreeList
+      );
+      let catNameList = [];
+      interestCatSelectedList.forEach(val => {
+        catNameList.push(val.name);
+        this.evaluate.activeNum += val.value;
+      });
+      this.evaluate.interestCatTxt = this.normalizeTxtShow(catNameList, 3);
+      this.evaluate.interestWordTxt = this.normalizeTxtShow(targeting.word, 3);
+      this.evaluate.interestURLTxt = this.normalizeTxtShow(targeting.url, 3);
+      this.interestWord =
+        targeting.word.length > 0 ? targeting.word.join("、") : "";
+      this.interestURL =
+        targeting.url.length > 0 ? targeting.url.join("、") : "";
+      console.log("this.evaluate.activeNum", this.evaluate.activeNum);
+      this.evaluate.activeTxt = this.normalizeActiveTxt(
+        this.evaluate.activeNum
+      );
+      // 网络环境
+      this.handleNewWorkEnv(this.targetingSetting.network_env);
+    },
+    // 初始化活跃用户数,传参为Number类型
+    normalizeActiveTxt(activeNum) {
+      console.log(activeNum);
+      let len = activeNum.toString().length;
+      let retTxt = "";
+      if (len < 5) {
+        retTxt = activeNum;
+        return `${activeNum}`;
+      } else if (len < 8) {
+        retTxt = Math.round(activeNum / 10000);
+        return `${retTxt} 万 +`;
+      } else {
+        retTxt = Math.round(activeNum / 1000000000);
+        return `${retTxt} 亿 +`;
+      }
+    },
+    // 初始化导入的兴趣数组，并返回匹配数组
+    normalizeInterestTreeList(arrList, srcList) {
+      this.evaluate.activeNum = 0;
+      const ret = [];
+      arrList.forEach(tar => {
+        srcList.forEach((vp, ip) => {
+          if (tar === vp.value) {
+            vp.checked = true;
+            vp.expand = true;
+            ret.push(vp);
+          }
+          vp.children.forEach((vc, ic) => {
+            if (tar === vc.value) {
+              vc.checked = true;
+              vc.expand = true;
+              ret.push(vc);
+              this.evaluate.activeNum += vc.value;
+            }
+          });
+        });
+      });
+      return ret;
     },
     // 更新推广单元数据
     updateUnit() {},
     // 新建推广单元数据
-    addUnit() {},
+    addUnit() {
+      let update = Object.assign({}, this.unitSetting, {
+        action: "ucAdPut",
+        opt: "addAdgroup",
+        campaign_id: parseInt(this.unitSetting.campaign_id),
+        generalizeType: parseInt(this.unitSetting.generalizeType),
+        adResourceId: parseInt(this.unitSetting.adResourceId),
+        chargeType: parseInt(this.unitSetting.chargeType),
+        convertMonitorType: parseInt(this.unitSetting.convertMonitorType),
+        adconvertId: parseInt(this.unitSetting.adconvertId),
+        optimizationTarget: parseInt(this.unitSetting.optimizationTarget),
+        unitType: parseInt(this.unitSetting.unitType),
+        bid: this.unitSetting.bid.toString(),
+        secondBid: this.unitSetting.secondBid.toString()
+      });
+      console.log("add this.unitSetting", update);
+      Axios.post("api.php", update)
+        .then(res => {
+          if (ERR_OK === res.ret) {
+            this.$Message.success("新建推广单元成功");
+            this.$router.push({
+              name: "ucidea",
+              query: {
+                account: this.unitSetting.account_id,
+                campaign_id: this.unitSetting.campaign_id,
+                adgroup_id: res.data.adgroup_id
+              }
+            });
+          }
+        })
+        .catch(err => {
+          console.log("新建推广单元失败" + err);
+        });
+    },
     // 事件：新建推广单元
     handleUnitSumbit() {
+      if (!this.isTargetingSubmit) {
+        this.handleTargetingSumbit();
+      }
       if (this.isEdit) {
         this.updateUnit();
       } else {
@@ -838,7 +1321,7 @@ export default {
     // 事件：重置导入推广单元的数据与显示
     handleClearImport() {
       this.unitAdgroupName = "";
-      this.unitSetting.campaign_name = "";
+      this.campaign_name = "";
       this.unitSetting.adgroup_name = "";
       this.pagePlatform = [];
       this.evaluate.platform = "";
@@ -846,7 +1329,7 @@ export default {
     // 事件：处理导入推广单元的计划数据
     handleChangeImportPlan(plan) {
       console.log(plan);
-      this.unitSetting.campaign_name = plan;
+      this.campaign_name = plan;
     },
     // 事件：处理导入推广单元的单元数据
     handleChangeImportUnit(unit) {
@@ -865,9 +1348,47 @@ export default {
       this.pagePlatform = this.platformStrToArray(this.unitSetting.platform);
       this.evaluate.platform = this.getPlatform(this.unitSetting.platform);
       this.unitSetting.chargeType = currUnit.chargeType;
+      this.unitSetting.generalizeType = currUnit.generalizeType;
+      this.handleGeneralizeType(this.unitSetting.generalizeType);
+    },
+    // 初始化APP定向列表
+    normalizeAPPList(appList, key) {
+      const ret = [];
+      if (appList[0].children.length < 1) {
+        return;
+      }
+      appList.forEach((app, i) => {
+        if (app.value === key) {
+          app.children.forEach((appp, ip) => {
+            ret.push({
+              title: appp.name,
+              expand: false,
+              value: appp.value
+            });
+            appp.children.forEach((appc, ic) => {
+              ret[ip].children.push({
+                title: appc.name,
+                expland: false,
+                value: appc.value
+              });
+            });
+          });
+          if (this.targetingSetting.appcategory.length > 0) {
+            this.targetingSetting.appcategory.forEach((value, iv) => {
+              ret.forEach((reti, ir) => {
+                if (value === ret.value) {
+                  reti[ir].checked = true;
+                }
+              });
+            });
+          }
+        }
+      });
+      return ret;
     },
     // 初始化兴趣列表
     normalizeInterestList(interestList) {
+      this.evaluate.activeNum = 0;
       const ret = [];
       interestList.forEach((interp, ip) => {
         ret.push({
@@ -882,6 +1403,7 @@ export default {
             expand: false,
             value: interc.value
           });
+          this.evaluate.activeNum += interc.value;
         });
       });
       if (this.targetingSetting.interest.length > 0) {
@@ -897,6 +1419,7 @@ export default {
     },
     // 初始化省市地域列表
     normalizeProvinceList(provinceList) {
+      this.evaluate.activeNum = 0;
       const ret = [];
       provinceList.forEach((province, pi) => {
         ret.push({
@@ -911,27 +1434,29 @@ export default {
             expand: false,
             value: city.value
           });
+          this.evaluate.activeNum += city.value;
         });
       });
       return ret;
     },
     // 获取转化列表
     getAdConvert(objType) {
-      Axios.post("api.php", {
-        action: "ucAdPut",
-        opt: "getAdConvert",
-        account_id: this.$route.query.account,
-        convertMonitorType: objType
-      })
-        .then(res => {
-          if (ERR_OK === res.ret) {
-            this.convert.convertList = res.data;
-            console.log("获取转化列表", this.convert.convertList);
-          }
-        })
-        .catch(err => {
-          console.log("获取转化列表错误：" + err);
-        });
+      // Axios.post("api.php", {
+      //   action: "ucAdPut",
+      //   opt: "getAdConvert",
+      //   account_id: this.$route.query.account,
+      //   convertMonitorType: objType
+      // })
+      //   .then(res => {
+      //     if (ERR_OK === res.ret) {
+      //       this.convert.convertList = res.data;
+      //       console.log("获取转化列表", this.convert.convertList);
+      //     }
+      //   })
+      //   .catch(err => {
+      //     console.log("获取转化列表错误：" + err);
+      //   });
+      this.convert.convertList = res.data;
     },
     // 获取转化类型列表
     getConvertMonitorTypes() {
@@ -943,6 +1468,7 @@ export default {
       //   .then(res => {
       //     if (ERR_OK === res.ret) {
       //       this.convert.convertMonitorTypesList = res.data;
+      //       this.convert.convertMonitorTypesListCopy = this.convert.convertMonitorTypesList.slice();
       //       console.log(
       //         "获取转化类型列表",
       //         this.convert.convertMonitorTypesList
@@ -955,6 +1481,44 @@ export default {
       // 本地测试代码
       this.convert.convertMonitorTypesList = convertTypeList.data;
     },
+    // 获取APP列表
+    getInterestAPP() {
+      // Axios.post("api.php", {
+      //   action: "ucAdPut",
+      //   opt: "getAppCategory",
+      //   account_id: this.$route.query.account
+      // })
+      //   .then(res => {
+      //     if (ERR_OK === res.ret) {
+      //       this.interestAPPList = res.data.appCategories;
+      //       const key = [1, 2]; // appCategories值，"1"为软件，"2"为游戏
+      //       this.interestAPPSFTreeList = this.normalizeAPPList(
+      //         this.interestAPPList,
+      //         key[0]
+      //       );
+      //       this.interestAPPGameTreeList = this.normalizeAPPList(
+      //         this.interestAPPList,
+      //         key[1]
+      //       );
+      //       console.log("获取APP列表", this.interestTypesList);
+      //     }
+      //   })
+      //   .catch(err => {
+      //     console.log("获取APP列表错误：" + err);
+      //   });
+      // 本地测试代码
+      this.interestAPPList = res.data.appCategories;
+      const key = ["1", "2"]; // appCategories值，"1"为软件，"2"为游戏
+      this.interestAPPSFTreeList = this.normalizeAPPList(
+        this.interestAPPList,
+        key[0]
+      );
+      this.interestAPPGameTreeList = this.normalizeAPPList(
+        this.interestAPPList,
+        key[1]
+      );
+      console.log("获取APP列表", this.interestTypesList);
+    },
     // 获取兴趣列表
     getInterestTypes() {
       // Axios.post("api.php", {
@@ -965,7 +1529,12 @@ export default {
       //   .then(res => {
       //     if (ERR_OK === res.ret) {
       //       this.interestTypesList = res.data.interestTypes;
-      //          this.interestTreeList = this.normalizeInterestList(this.interestTypesList)
+      //       this.interestTreeList = this.normalizeInterestList(
+      //         this.interestTypesList
+      //       );
+      //       this.evaluate.activeTxt = this.normalizeActiveTxt(
+      //         this.evaluate.activeNum
+      //       );
       //       console.log("获取兴趣列表", this.interestTypesList);
       //     }
       //   })
@@ -989,7 +1558,12 @@ export default {
       //   .then(res => {
       //     if (ERR_OK === res.ret) {
       //       this.provinceList = res.data.provinces;
-      //       this.provinceTreeList = this.normalizeProvinceList(this.provinceList);
+      //       this.provinceTreeList = this.normalizeProvinceList(
+      //         this.provinceList
+      //       );
+      //       this.evaluate.activeTxt = this.normalizeActiveTxt(
+      //         this.evaluate.activeNum
+      //       );
       //       console.log("获取省市地域列表", this.provinceList);
       //     }
       //   })
@@ -1001,92 +1575,120 @@ export default {
       this.provinceTreeList = this.normalizeProvinceList(this.provinceList);
       console.log("获取省市地域列表", this.provinceList);
     },
+    // 根据id获取单元内容
+    getCampaignUnit() {
+      Axios.post("api.php", {
+        action: "ucAdPut",
+        opt: "getAdgroupById",
+        adgroup_id: this.$route.query.adgroup_id
+      })
+        .then(res => {
+          if (ERR_OK === res.ret) {
+            this.unitSetting = res.data;
+            console.log("根据id获取单元内容", res.data);
+          }
+        })
+        .catch(err => {
+          console.log("获取单元内容数据错误：" + err);
+        });
+      // 本地测试代码
+      this.unitSetting = unitbyid.data;
+    },
     // 获取推广单元数据
     getCampaignUnit() {
-      // Axios.post("api.php", {
-      //   action: "ucAdPut",
-      //   opt: "getAdgroupsList",
-      //   campaign_id: "30428830"
-      // })
-      //   .then(res => {
-      //     if (ERR_OK === res.ret) {
-      //       this.importDate.unitlist = res.data;
-      //       console.log(
-      //         "单元this.importDate.unitlist",
-      //         this.importDate.unitlist
-      //       );
-      //     }
+      //   Axios.post("api.php", {
+      //     action: "ucAdPut",
+      //     opt: "getAdgroupsList",
+      //     campaign_id: this.$route.query.campaign_id
       //   })
-      //   .catch(err => {
-      //     console.log("获取推广单元数据错误：" + err);
-      //   });
+      //     .then(res => {
+      //       if (ERR_OK === res.ret) {
+      //         this.importDate.unitlist = res.data;
+      //         console.log(
+      //           "单元this.importDate.unitlist",
+      //           this.importDate.unitlist
+      //         );
+      //       }
+      //     })
+      //     .catch(err => {
+      //       console.log("获取推广单元数据错误：" + err);
+      //     });
       // 本地测试代码
       this.importDate.unitlist = unitList.data;
     },
     // 获取推广计划数据
     getCampaignPlan() {
-      // Axios.post("api.php", {
-      //   action: "ucAdPut",
-      //   opt: "getCampaignsList"
-      // })
-      //   .then(res => {
-      //     if (ERR_OK === res.ret) {
-      //       this.importDate.planlist = res.data;
-      //       console.log(
-      //         "单元this.importDate.planlist",
-      //         this.importDate.planlist
-      //       );
-      //     }
+      //   Axios.post("api.php", {
+      //     action: "ucAdPut",
+      //     opt: "getCampaignsList"
       //   })
-      //   .catch(err => {
-      //     console.log("获取推广计划数据错误：" + err);
-      //   });
+      //     .then(res => {
+      //       if (ERR_OK === res.ret) {
+      //         this.importDate.planlist = res.data;
+      //         console.log(
+      //           "单元this.importDate.planlist",
+      //           this.importDate.planlist
+      //         );
+      //       }
+      //     })
+      //     .catch(err => {
+      //       console.log("获取推广计划数据错误：" + err);
+      //     });
       // 本地测试代码
       this.importDate.planlist = planList.data;
     },
     // 获取定向设置数据
     getTargetingList() {
-      // Axios.post("api.php", {
-      //   action: "ucAdPut",
-      //   opt: "getTargetingList"
-      // })
-      //   .then(res => {
-      //     if (ERR_OK === res.ret) {
-      //       this.targetingList = res.data;
-      //       console.log("targetingList", this.targetingList);
-      //     }
+      //   Axios.post("api.php", {
+      //     action: "ucAdPut",
+      //     opt: "getTargetingList"
       //   })
-      //   .catch(err => {
-      //     console.log("获取定向设置数据错误：" + err);
-      //   });
+      //     .then(res => {
+      //       if (ERR_OK === res.ret) {
+      //         this.targetingList = res.data;
+      //         console.log("targetingList", this.targetingList);
+      //       }
+      //     })
+      //     .catch(err => {
+      //       console.log("获取定向设置数据错误：" + err);
+      //     });
       // 本地测试代码
       this.targetingList = targetingList.data;
     },
     // 获取account信息
     getAccountInfo() {
-      const query = this.$route.query;
-      const params = this.$route.params;
-      console.log("unit router query", query, params);
-      this.adgroupId = params.adgroup_id;
-      if (
-        typeof query === "object" &&
-        query.account &&
-        query.campaign_id &&
-        query.edit &&
-        query.edit === "1"
-      ) {
-        if (params && params.account_id) {
-          this._assignMethod(this.unitSetting, params);
-          this.unitSetting.bid = parseInt(this.unitSetting.bid);
-          this.unitSetting.secondBid = parseInt(this.unitSetting.secondBid);
-          this._assignMethod(this.targetingSetting, params);
-          this.isEdit = true;
-        } else {
-          this.handleGoBack();
-        }
-      } else {
-        this.isEdit = false;
-      }
+      // const query = this.$route.query;
+      // const params = this.$route.params;
+      // console.log("unit router query", query, params);
+      // this.adgroupId = params.adgroup_id;
+      // if (
+      //   typeof query === "object" &&
+      //   query.account &&
+      //   query.campaign_id &&
+      //   query.edit &&
+      //   query.edit === "1"
+      // ) {
+      //   if (params && params.account_id) {
+      //     this.getCampaignUnit();
+      //     this._assignMethod(this.unitSetting, getCampaignUnit);
+      //     this.unitSetting.bid = parseInt(this.unitSetting.bid);
+      //     this.unitSetting.secondBid = parseInt(this.unitSetting.secondBid);
+      //     this._assignMethod(this.targetingSetting, params);
+      //     this.isEdit = true;
+      //   } else {
+      //     this.handleGoBack();
+      //   }
+      // } else {
+      //   this.isEdit = false;
+      //   this.unitSetting.account_id = query.account;
+      //   this.unitSetting.campaign_id = query.campaign_id;
+      // }
+      this.getCampaignUnit();
+      this._assignMethod(this.unitSetting, getCampaignUnit);
+      this.unitSetting.bid = parseInt(this.unitSetting.bid);
+      this.unitSetting.secondBid = parseInt(this.unitSetting.secondBid);
+      this._assignMethod(this.targetingSetting, params);
+      this.isEdit = true;
     },
     /**
      * 赋值函数
