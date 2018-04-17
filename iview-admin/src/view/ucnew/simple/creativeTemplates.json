@@ -8,29 +8,34 @@
       "creativeTemplateName": "信息流小图下载",
       "creativeTemplateFields": [
         {
-          "key": "app_name",
-          "alias": "APP名称",
-          "tips": "APP名称字符范围为2-20"
-        },
-        {
           "key": "title",
           "alias": "标题",
-          "tips": "标题字符范围为10-45"
+          "tips": "标题字符范围为10-70",
+          "size": "10-70"
         },
         {
           "key": "source",
           "alias": "推广来源",
-          "tips": "推广来源字符范围为1-16"
+          "tips": "推广来源字符范围为1-16",
+          "size": "1-16"
+        },
+        {
+          "key": "target_url",
+          "alias": "点击URL",
+          "tips": "以http或https开头，长度不能大于1024个字符",
+          "size": "1024"
         },
         {
           "key": "pic1_img",
           "alias": "图片",
-          "tips": "jpg/png格式,尺寸140*105，图片大小不能超过20kb"
+          "tips": "jpg/png格式,尺寸640*300，图片大小不能超过90kb",
+          "size": "90"
         },
         {
           "key": "scheme_url",
           "alias": "直达链接",
-          "tips": "长度不能大于1024个字符"
+          "tips": "长度不能大于1024个字符",
+          "size": "1024"
         }
       ]
     },
@@ -57,8 +62,7 @@
         {
           "key": "pic1_img",
           "alias": "图片",
-          "tips":
-            "jpg/png格式,尺寸640*300，图片大小不能超过90kb"
+          "tips": "jpg/png格式,尺寸640*300，图片大小不能超过90kb"
         },
         {
           "key": "scheme_url",
@@ -85,20 +89,17 @@
         {
           "key": "pic1_img",
           "alias": "图片",
-          "tips":
-            "请上传160*120，大小不超过20kb图片，支持jpg/png"
+          "tips": "请上传160*120，大小不超过20kb图片，支持jpg/png"
         },
         {
           "key": "pic2_img",
           "alias": "图片",
-          "tips":
-            "请上传160*120，大小不超过20kb图片，支持jpg/png"
+          "tips": "请上传160*120，大小不超过20kb图片，支持jpg/png"
         },
         {
           "key": "pic3_img",
           "alias": "图片",
-          "tips":
-            "请上传160*120，大小不超过20kb图片，支持jpg/png"
+          "tips": "请上传160*120，大小不超过20kb图片，支持jpg/png"
         },
         {
           "key": "source",

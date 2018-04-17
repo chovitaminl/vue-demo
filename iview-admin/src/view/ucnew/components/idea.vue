@@ -10,6 +10,7 @@
 }
 .uc-idea {
   box-sizing: border-box;
+  background-color: #fff;
 }
 .uc-idea-content {
   padding: 0 20px;
@@ -53,22 +54,50 @@
   width: 392px;
 }
 .g-src {
+  position: relative;
   padding-bottom: 20px;
   .tip {
     color: #969696;
     line-height: 24px;
+  }
+  .template {
+    position: relative;
+    .mask {
+      // display: none;
+      position: absolute;
+      bottom: 0;
+      top: 0;
+      left: 0;
+      width: 100%;
+      text-align: center;
+      z-index: 1000;
+      background-color: #fff;
+      .image-view {
+        height: 100%;
+      }
+    }
+    .g-flex {
+      .g-flex-item {
+        position: relative;
+      }
+    }
+  }
+  .btn-close {
+    display: inline-block;
+    width: 30px;
+    height: 30px;
+    position: absolute;
+    right: 0;
+    top: 0;
+    color: #ff0000;
+    font-size: 20px;
+    cursor: pointer;
   }
 }
 .btn-green {
   color: #19be6b;
   border-color: #19be6b !important;
 }
-// .ivu-icon-ios-cloud-upload:before {
-//     color: #19be6b;
-// }
-// .ivu-radio-inner:after {
-//     background-color: #19be6b;
-// }
 button.ivu-btn {
   margin: 0 10px;
   border-radius: 0;
@@ -85,6 +114,7 @@ button.ivu-btn {
       font-size: 15px;
       max-height: 44px;
       overflow: hidden;
+      height: 24px;
       line-height: 24px;
       font-weight: 400;
       color: #333;
@@ -93,14 +123,61 @@ button.ivu-btn {
       -webkit-box-orient: vertical;
       text-overflow: ellipsis;
     }
-    .image {
-      position: relative;
+    .bg-image {
       width: 341px;
+      height: 160px;
+      overflow: hidden;
+      background: url("./new.jpg")no-repeat top center;
+      background-size: 341px 160px;
+      .image {
+        position: relative;
+        width: 341px;
+      }
     }
     .desc {
       margin: 10px;
+      overflow: hidden;
       .item {
         margin-right: 10px;
+      }
+    }
+  }
+  .phone-template2 {
+    height: 300px;
+    .content {
+      margin: 10px 0;
+      justify-content: space-around;
+      align-items: center;
+      height: 95px;
+      .item-lt {
+        flex: 1;
+      }
+      .item-rt {
+        flex: 0 0 100px;
+        width: 100px;
+        .bg-image {
+          max-width: 100px;
+          height: 75px;
+          .image {
+            width: inherit;
+            height: inherit;
+          }
+        }
+      }
+    }
+  }
+  .phone-template3 {
+    height: 350px;
+    .image-content {
+      justify-content: space-between;
+      align-items: center;
+      .bg-image {
+        width: 110px;
+        height: 82px;
+        .image {
+          width: inherit;
+          height: inherit;
+        }
       }
     }
   }
@@ -132,69 +209,100 @@ button.ivu-btn {
 
       <div class="g-style g-flex border-bottom padding-lr-30 padding-tb-20">
         <h3 class="sub-title color-green item">创意样式</h3>
-        <RadioGroup v-model="creativeSetting.creativeTemplate_id">
-          <Radio :label="1" :class="{'btn-green': creativeSetting.creativeTemplate_id === 1}" class="item">信息流大图</Radio>
-          <Radio :label="2" :class="{'btn-green': creativeSetting.creativeTemplate_id === 2}" class="item">信息流小图</Radio>
-          <Radio :label="3" :class="{'btn-green': creativeSetting.creativeTemplate_id === 3}" class="item">信息流三图</Radio>
+        <!-- <RadioGroup @on-change="handleChangeTemplate" v-model="creativeSetting.creativeTemplate_id">
+          <Radio :label="4" :class="{'btn-green': creativeSetting.creativeTemplate_id === 4}" :disabled="isEdit" class="item">信息流大图</Radio>
+          <Radio :label="5" :class="{'btn-green': creativeSetting.creativeTemplate_id === 5}" :disabled="isEdit" class="item">信息流小图</Radio>
+          <Radio :label="34" :class="{'btn-green': creativeSetting.creativeTemplate_id === 34}" :disabled="isEdit" class="item">信息流三图</Radio>
+        </RadioGroup> -->
+
+        <RadioGroup @on-change="handleChangeTemplate" v-model="creativeSetting.creativeTemplate_id">
+          <Radio v-if="creativeTemplates && creativeTemplates.length > 0" v-for="(template, index) in creativeTemplates" :label="template.creativeTemplateId" :class="{'btn-green': creativeSetting.creativeTemplate_id === template.creativeTemplateId}" :disabled="isEdit" class="item">{{template.creativeTemplateName}}</Radio>
         </RadioGroup>
+
       </div>
 
       <div class="g-flex border-bottom">
         <div class="g-flex-lt">
           <div class="g-src border-bottom padding-lr-30">
             <h3 class="sub-title color-green padding-tb-20">创意样式</h3>
-            <div v-if="creativeSetting.creativeTemplate_id === 1" class="template-1">
+            <div v-if="creativeSetting.creativeTemplate_id === 4" class="template template-1">
               <p class="tip">jpg/png格式,尺寸640*300，图片大小不能超过90kb</p>
-              <Upload type="drag" action="">
+              <Upload type="drag" :action="actionUrl" accept="image/*" :format="['jpg','png']" :show-upload-list="false" :max-size="90" :on-success="handleSuccess" :on-format-error="handleFormatError" :on-exceeded-size="handleMaxSize" :before-upload="handleBeforeUpload">
                 <div style="padding: 20px 0">
                   <Icon type="ios-cloud-upload" size="52" style="color: #3399ff"></Icon>
                   <p>点击或将文件拖住到此上传</p>
                 </div>
               </Upload>
+              <div v-show="pic1_img" ref="imageMask" class="mask">
+                <div ref="btnClose" @click="handleCloseMask" class="btn-close">x</div>
+                <img :src="pic1_img" alt="" class="image-view">
+              </div>
             </div>
-            <div v-if="creativeSetting.creativeTemplate_id === 2" class="template-2">
+            <div v-if="creativeSetting.creativeTemplate_id === 5" class="template template-2">
               <p class="tip">jpg/png格式,尺寸140*105，图片大小不能超过20kb</p>
-              <Upload type="drag" action="">
+              <Upload type="drag" :action="actionUrl" accept="image/*" :format="['jpg','png']" :show-upload-list="false" :max-size="20" :on-success="handleSuccess" :on-format-error="handleFormatError" :on-exceeded-size="handleMaxSize" :before-upload="handleBeforeUpload">
                 <div style="padding: 20px 0">
                   <Icon type="ios-cloud-upload" size="52" style="color: #3399ff"></Icon>
                   <p>点击或将文件拖住到此上传</p>
                 </div>
               </Upload>
+              <div v-show="pic2_img" ref="imageMask" class="mask">
+                <div ref="btnClose" @click="handleCloseMask" class="btn-close">x</div>
+                <img :src="pic2_img" alt="" class="image-view">
+              </div>
             </div>
-            <div v-if="creativeSetting.creativeTemplate_id === 3" class="template-3">
+            <div v-if="creativeSetting.creativeTemplate_id === 34" class="template template-3">
               <p class="tip">jpg/png格式,尺寸160*120，图片大小不能超过20kb</p>
               <div class="g-flex">
                 <div class="g-flex-item">
-                  <Upload type="drag" action="">
+                  <Upload type="drag" :action="actionUrl" accept="image/*" :format="['jpg','png']" :show-upload-list="false" :max-size="20" :on-success="handleSuccess31" :on-format-error="handleFormatError" :on-exceeded-size="handleMaxSize" :before-upload="handleBeforeUpload" @click="customUpload" class="hook-upload1">
                     <div style="padding: 20px 0">
                       <Icon type="ios-cloud-upload" size="52" style="color: #3399ff"></Icon>
                       <p>点击或将文件拖住到此上传</p>
                     </div>
                   </Upload>
+                  <div v-show="pic31_img" ref="imageMask" class="mask">
+                    <div ref="btnClose" @click="handleCloseMask" class="btn-close">x</div>
+                    <img v-if="pic31_img" :src="pic31_img" alt="" class="image-view">
+                  </div>
                 </div>
                 <div class="g-flex-item">
-                  <Upload type="drag" action="">
+                  <Upload type="drag" :action="actionUrl" accept="image/*" :format="['jpg','png']" :show-upload-list="false" :max-size="20" :on-success="handleSuccess32" :on-format-error="handleFormatError" :on-exceeded-size="handleMaxSize" :before-upload="handleBeforeUpload" @click="customUpload" class="hook-upload2">
                     <div style="padding: 20px 0">
                       <Icon type="ios-cloud-upload" size="52" style="color: #3399ff"></Icon>
                       <p>点击或将文件拖住到此上传</p>
                     </div>
                   </Upload>
+                  <div v-show="pic32_img" ref="imageMask" class="mask">
+                    <div ref="btnClose" @click="handleCloseMask" class="btn-close">x</div>
+                    <img v-if="pic32_img" :src="pic32_img" alt="" class="image-view">
+                  </div>
                 </div>
                 <div class="g-flex-item">
-                  <Upload type="drag" action="">
+                  <Upload type="drag" :action="actionUrl" accept="image/*" :format="['jpg','png']" :show-upload-list="false" :max-size="20" :on-success="handleSuccess33" :on-format-error="handleFormatError" :on-exceeded-size="handleMaxSize" :before-upload="handleBeforeUpload" @click="customUpload" class="hook-upload3">
                     <div style="padding: 20px 0">
                       <Icon type="ios-cloud-upload" size="52" style="color: #3399ff"></Icon>
                       <p>点击或将文件拖住到此上传</p>
                     </div>
                   </Upload>
+                  <div v-show="pic33_img" ref="imageMask" class="mask">
+                    <div ref="btnClose" @click="handleCloseMask" class="btn-close">x</div>
+                    <img v-if="pic33_img" :src="pic33_img" alt="" class="image-view">
+                  </div>
                 </div>
               </div>
             </div>
+
+            <!-- <div ref="imageMask" class="mask">
+              <div ref="btnClose" @click="handleCloseMask" class="btn-close">x</div>
+              <img src="" alt="" class="image-view">
+            </div> -->
+
           </div>
 
           <div class="g-content padding-lr-30">
             <h3 class="sub-title color-green padding-tb-20">创意文本及URL</h3>
-            <Form ref="ideaSetting" :model="creativeSetting" :label-width="126" label-position="left">
+            <!-- <Form ref="ideaSetting" :model="creativeSetting" :label-width="126" label-position="left">
               <FormItem label="标题">
                 <Input @on-blur="handleTitle" v-model="creativeSetting.content.title" :maxlength="70" placeholder="标题" class="item-width"></Input>
                 <p class="font-size-12 color-red">标题字符范围为10-70</p>
@@ -208,22 +316,72 @@ button.ivu-btn {
                 <p class="font-size-12 color-red">以http或https开头，长度不能大于1024个字符</p>
               </FormItem>
               <FormItem label="点击监测链接">
-                <Input @on-blur="handleSchemeUrl" type="url" v-model="creativeSetting.clickMonitorUrl" :maxlength="1024" placeholder="点击监测链接" class="item-width"></Input>（可选）
+                <Input @on-blur="handleMonitorUrl" type="url" v-model="creativeSetting.clickMonitorUrl" :maxlength="1024" placeholder="点击监测链接" class="item-width"></Input>（可选）
                 <p class="font-size-12 color-grey">请以http或https开头，长度不能大于1024个字符</p>
               </FormItem>
+            </Form> -->
+
+            <Form v-show="template.creativeTemplateId === creativeSetting.creativeTemplate_id" v-if="creativeTemplates && creativeTemplates.length > 0" v-for="(template, ip) in creativeTemplates" :key="ip" :model="creativeSetting" :label-width="126" label-position="left">
+              <FormItem v-if="field.alias !== '图片'" v-for="(field, ic) in template.creativeTemplateFields" :key="ic" :label="field.alias">
+                <Input @on-blur="handleField" v-model="creativeSetting.content[field.key]" :placeholder="field.alias" class="item-width"></Input>
+                <p class="font-size-12 color-red">{{field.tips}}</p>
+              </FormItem>
             </Form>
+
           </div>
         </div>
         <div class="phone-preview g-flex-rt padding-lr-30">
           <h3 class="sub-title color-green padding-tb-20">广告预览</h3>
-          <div class="bg-phone">
-            <div class="title">{{creativeSetting.content.title}}</div>
-            <img src="https://e.uc.cn/hcfs/web/fs/inner/mediaimg/1/adstyle/adstyle_1_e0792957c270867cfa57de76a89c037a.jpg" alt="" class="image">
+          <div v-show="creativeSetting.creativeTemplate_id === 4" class="bg-phone phone-template1">
+            <div class="title">{{title}}</div>
+            <div class="bg-image">
+              <img v-show="pic1_img" :src="pic1_img" alt="广告预览" class="image">
+            </div>
             <div class="desc">
               <Icon type="volume-high"></Icon>
               <span class="item">推广</span>
               <span class="item">刚刚</span>
-              <span class="item">{{creativeSetting.content.source}}</span>
+              <span class="item">{{source}}</span>
+            </div>
+            <div class="phone-foot"></div>
+          </div>
+          <div v-show="creativeSetting.creativeTemplate_id === 5" class="bg-phone phone-template2">
+            <div class="content g-flex border-bottom">
+              <div class="item-lt">
+                <div class="title">{{title}}</div>
+                <div class="desc">
+                  <Icon type="volume-high"></Icon>
+                  <span class="item">推广</span>
+                  <span class="item">刚刚</span>
+                  <span class="item">{{source}}</span>
+                </div>
+              </div>
+              <div class="item-rt">
+                <div class="bg-image">
+                  <img v-show="pic2_img" :src="pic2_img" alt="广告预览" class="image">
+                </div>
+              </div>
+            </div>
+            <div class="phone-foot"></div>
+          </div>
+          <div v-show="creativeSetting.creativeTemplate_id === 34" class="bg-phone phone-template3">
+            <div class="title">{{title}}</div>
+            <div class="image-content g-flex">
+              <div class="bg-image">
+                <img v-show="pic31_img" :src="pic31_img" alt="广告预览" class="image">
+              </div>
+              <div class="bg-image">
+                <img v-show="pic32_img" :src="pic32_img" alt="广告预览" class="image">
+              </div>
+              <div class="bg-image">
+                <img v-show="pic33_img" :src="pic33_img" alt="广告预览" class="image">
+              </div>
+            </div>
+            <div class="desc">
+              <Icon type="volume-high"></Icon>
+              <span class="item">推广</span>
+              <span class="item">刚刚</span>
+              <span class="item">{{source}}</span>
             </div>
             <div class="phone-foot"></div>
           </div>
@@ -240,51 +398,181 @@ button.ivu-btn {
 
 <script>
 import Axios from "@/api/index";
+import { deepClone } from "@/utils/DateShortcuts.js";
 import unitbyid from "../simple/unitbyid";
 import getCampaignNameList from "../simple/getCampaignNameList";
 import creativeTemplates from "../simple/creativeTemplates";
 const ERR_OK = 1;
-
 export default {
+  // 图片模板类型： 大图：big，小图：small，三图：three
   data() {
     return {
       isEdit: false, // 判断当前推广计划状态：true为编辑状态，false为新建状态
-      campaignNameList: "", // 计划名称列表
+      campaignNameList: [], // 计划名称列表
       campaignName: "", // 当前计划名称
       adgroupName: "", // 当前单元名称
-      creativeTemplates: [], // creativeTemplates
-      // accountId: this.$route.query.account,
-      // campaignId: this.$route.query.campaign_id,
-      // adgroupId: this.$route.query.adgroup_id,
-      creativeId: 0,
+      currCreativeList: [], // 当前创意列表
+      creativeTemplates: [], // 当前创意模板
+      currCreativeTemplatesIdList: [], // 当前创意模板 的 id
+      creativeTemplatesFieldsList: [], // 当前创意模板 的 fields 字段
+      creativeTemplatesViewList: [], // 当前创意数据 的 用于处理视图数据
       accountId: this.$route.query.account,
-      campaignId: "30433927",
+      campaignId: this.$route.query.campaign_id,
       adgroupId: this.$route.query.adgroup_id,
+      creativeId: this.$route.query.creative,
+      currId: 0, // isEdit=true 状态下 用于获取创意内容
+      // accountId: this.$route.query.account,
+      // campaignId: "30433927",
+      // adgroupId: this.$route.query.adgroup_id,
       creativeSetting: {
         account_id: this.$route.query.account,
         adgroup_id: this.$route.query.adgroup_id,
         campaign_id: this.$route.query.campaign_id,
-        videold: 0,
-        creativeTemplate_id: 1,
-        content: [],
+        videoId: 0,
+        creativeTemplate_id: 4,
         clickMonitorUrl: "", // 点击URL
-        wildcardIds: "",
-        content: {
-          app_name: "", // APP名称
-          title: "",
-          source: "", // 推广来源
-          pic1_img: "",
-          pic2_img: "",
-          pic3_img: "",
-          scheme_url: "" // 直达链接
-        }
+        wildcardIds: 0,
+        content: {}
       },
+      app_name: "", // APP名称
+      title: "贪玩",
+      source: "", // 推广来源
+      scheme_url: "", // 直达链接
+      target_url: "", // 点击URL
+      description: "", // 描述
+      pic1_img: "",
+      pic2_img: "",
+      pic31_img: "",
+      pic32_img: "",
+      pic33_img: "",
       isTitleErr: false,
       isSourceErr: false,
-      isUrlErr: false
+      isUrlErr: false,
+      isImageErr: false,
+      image: {
+        name: "img",
+        type: "string",
+        size: 90,
+        format: "*.jpg|*.png",
+        width: 640,
+        height: 300
+      },
+      imageResp: {
+        image_id1: "",
+        srcImageUrl1: "",
+        image_id2: "",
+        srcImageUrl2: "",
+        image_id31: "",
+        srcImageUrl31: "",
+        image_id32: "",
+        srcImageUrl32: "",
+        image_id33: "",
+        srcImageUrl33: ""
+      },
+      actionUrl: ""
     };
   },
   methods: {
+    customUpload(e) {
+      console.log("e", e.target.className);
+    },
+    handleSuccess31(filte) {
+      let img = filte.data;
+      this.imageResp.image_id31 = img.image_id;
+      this.imageResp.srcImageUrl31 = img.srcImageUrl;
+      this.pic31_img = img.srcImageUrl;
+    },
+    handleSuccess32(filte) {
+      let img = filte.data;
+      this.imageResp.image_id32 = img.image_id;
+      this.imageResp.srcImageUrl32 = img.srcImageUrl;
+      this.pic32_img = img.srcImageUrl;
+    },
+    handleSuccess33(filte) {
+      let img = filte.data;
+      this.imageResp.image_id33 = img.image_id;
+      this.imageResp.srcImageUrl33 = img.srcImageUrl;
+      this.pic33_img = img.srcImageUrl;
+    },
+    handleSuccess(filte) {
+      if (filte.ret == "1") {
+        console.log("Success", filte);
+        let img = filte.data;
+        switch (this.creativeSetting.creativeTemplate_id) {
+          case 4:
+            this.imageResp.image_id1 = img.image_id;
+            this.imageResp.srcImageUrl1 = img.srcImageUrl;
+            this.pic1_img = img.srcImageUrl;
+            break;
+          case 5:
+            this.imageResp.image_id2 = img.image_id;
+            this.imageResp.srcImageUrl2 = img.srcImageUrl;
+            this.pic2_img = img.srcImageUrl;
+            break;
+        }
+        console.log("this.pic1_img", this.creativeTemplate_id, this.pic1_img);
+        return;
+      }
+      if (filte.ret == "-1") {
+        this.$Notice.warning({
+          desc: filte.msg
+        });
+      }
+    },
+    handleFormatError(file) {
+      this.$Notice.warning({
+        title: "文件格式不正确",
+        desc: "文件 " + file.name + " 格式不正确，请选择图片文件。"
+      });
+    },
+    defaultList(list) {
+      console.log("defaultList", list);
+    },
+    handleBeforeUpload(file) {
+      console.log(
+        "handleBeforeUpload",
+        this.actionUrl,
+        file,
+        file.size,
+        typeof file.size
+      );
+      // console.log(file)
+      // console.log(this.imgSize)
+      // this.$Notice.warning({
+      //     title: '文件准备上传',
+      //     desc: '文件 ' + file.name + ' 准备上传。'
+      // });
+    },
+    handleProgress(event, file) {
+      // this.loading = true;
+      // this.percent = event.percent;
+      // if (event.percent === 100) {
+      //     this.loading = false;
+      // }
+      //console.log(event.percent)
+      // this.$Notice.info({
+      //     title: '文件正在上传',
+      //     desc: '文件 ' + file.name + ' 正在上传。'
+      // });
+    },
+    handleMaxSize(file) {
+      //  console.log("handleMaxSize",this.actionUrl, file.size, typeof file.size)
+      // this.$Notice.warning({
+      //     title: "超出文件大小限制",
+      //     desc:
+      //         "文件 " +
+      //         file.name +
+      //         " 太大，不能超过" +
+      //         this.imgSize +
+      //         "KB。"
+      // });
+    },
+    handleError(event, file) {
+      this.$Notice.error({
+        title: "文件上传失败",
+        desc: "文件 " + file.name + " 上传失败。"
+      });
+    },
     // 获取字符长度
     getByteLen(str) {
       let len = 0;
@@ -298,10 +586,18 @@ export default {
       }
       return len;
     },
-    handleSchemeUrl(blur) {
+    handleCloseMask(e) {
+      const parCls = "mask";
+      let currParDOM = e.target.parentNode;
+      currParDOM.style.display = "none";
+    },
+    handleDescription(currStr) {
+      console.log("handleDescription", currStr);
+    },
+    handleMonitorUrl(currStr) {
+      console.log("handleMonitorUrl", currStr);
       const len = [1024];
       const reg = /^(http:\/\/|https:\/\/)/;
-      let currStr = blur.target.value;
       let currLen = this.getByteLen(currStr);
       if (len[0] < currLen) {
         this.$Notice.warning({
@@ -321,10 +617,36 @@ export default {
         });
         this.isUrlErr = true;
       }
+      this.creativeSetting.clickMonitorUrl = currStr;
     },
-    handleSource(blur) {
+    handleSchemeUrl(currStr) {
+      console.log("handleSchemeUrl", currStr);
+      const len = [1024];
+      const reg = /^(http:\/\/|https:\/\/)/;
+      let currLen = this.getByteLen(currStr);
+      if (len[0] < currLen) {
+        this.$Notice.warning({
+          title: "温馨提示：",
+          desc: "点击URL字符长度不能大于1024个字符"
+        });
+        this.isUrlErr = true;
+      } else {
+        this.isUrlErr = false;
+      }
+      if (reg.test(currStr)) {
+        this.isUrlErr = false;
+      } else {
+        this.$Notice.warning({
+          title: "温馨提示：",
+          desc: "URL必须以http或https开头"
+        });
+        this.isUrlErr = true;
+      }
+      this.creativeSetting.content.scheme_url = currStr;
+    },
+    handleSource(currStr) {
+      console.log("handleSource", currStr);
       const len = [1, 16];
-      let currStr = blur.target.value;
       let currLen = this.getByteLen(currStr);
       if (len[0] > currLen) {
         this.$Notice.warning({
@@ -341,10 +663,11 @@ export default {
       } else {
         this.isSourceErr = false;
       }
+      this.source = currStr;
     },
-    handleTitle(blur) {
+    handleTitle(currStr) {
+      console.log("handleTitle", currStr);
       const len = [10, 70];
-      let currStr = blur.target.value;
       let currLen = this.getByteLen(currStr);
       if (len[0] > currLen) {
         this.$Notice.warning({
@@ -361,9 +684,172 @@ export default {
       } else {
         this.isTitleErr = false;
       }
+      this.title = currStr;
     },
-    handlebtnStyle(id) {
-      this.btnStatus = id;
+    handleAppName(currStr) {
+      console.log("handleAppName", currStr);
+    },
+    handleTargetURL(currStr) {
+      console.log("handleTargetURL", currStr);
+    },
+    handleField(e) {
+      let tarName = e.target.placeholder;
+      let currValue = e.target.value;
+      switch (tarName) {
+        case "标题":
+          this.handleTitle(currValue);
+          break;
+        case "推广来源":
+          this.handleSource(currValue);
+          break;
+        case "点击URL":
+          this.handleTargetURL(currValue);
+          break;
+        case "直达链接":
+          this.handleSchemeUrl(currValue);
+          break;
+        case "APP名称":
+          this.handleAppName(currValue);
+          break;
+        case "描述":
+          this.handleDescription(currValue);
+          break;
+        case "描述":
+          this.handleMonitorUrl(currValue);
+          break;
+      }
+    },
+    handleChangeTemplate(id) {
+      console.log("id", id, typeof id);
+      const imgSizeList = [
+        { width: 640, height: 300, size: 90 },
+        { width: 140, height: 105, size: 20 },
+        { width: 160, height: 120, size: 20 }
+      ];
+      switch (id) {
+        case 4:
+          this.image.width = imgSizeList[0].width;
+          this.image.height = imgSizeList[0].height;
+          this.image.size = imgSizeList[0].size;
+          this.actionUrl =
+            "http://ads.tanwan.com/api.php?action=ucAdPut&opt=adsimg_doadd&account_id=" +
+            this.accountId +
+            "&target_width=" +
+            this.image.width +
+            "&target_height=" +
+            this.image.height;
+          console.log(
+            "image width height",
+            this.image.width,
+            this.image.height,
+            this.actionUrl
+          );
+          break;
+        case 5:
+          this.image.width = imgSizeList[1].width;
+          this.image.height = imgSizeList[1].height;
+          this.image.size = imgSizeList[1].size;
+          this.actionUrl =
+            "http://ads.tanwan.com/api.php?action=ucAdPut&opt=adsimg_doadd&account_id=" +
+            this.accountId +
+            "&target_width=" +
+            this.image.width +
+            "&target_height=" +
+            this.image.height;
+          console.log(
+            "image width height",
+            this.image.width,
+            this.image.height,
+            this.actionUrl
+          );
+          break;
+        case 34:
+          this.image.width = imgSizeList[2].width;
+          this.image.height = imgSizeList[2].height;
+          this.image.size = imgSizeList[2].size;
+          this.actionUrl =
+            "http://ads.tanwan.com/api.php?action=ucAdPut&opt=adsimg_doadd&account_id=" +
+            this.accountId +
+            "&target_width=" +
+            this.image.width +
+            "&target_height=" +
+            this.image.height;
+          console.log(
+            "image width height",
+            this.image.width,
+            this.image.height,
+            this.actionUrl
+          );
+          break;
+      }
+    },
+    // 初始化创意 编辑 状态下的数据
+    initEditIdea() {
+      this.creativeSetting.account_id = this.currCreativeList.account_id;
+      this.creativeSetting.adgroup_id = this.currCreativeList.adgroup_id;
+      this.creativeSetting.campaign_id = this.currCreativeList.campaign_id;
+      this.creativeSetting.videoId = this.currCreativeList.videoId
+        ? this.currCreativeList.videoId
+        : "0";
+      this.creativeSetting.creativeTemplate_id = parseInt(
+        this.currCreativeList.creativeTemplate_id
+      );
+      this.creativeSetting.clickMonitorUrl = this.currCreativeList.clickMonitorUrl;
+      this.creativeSetting.wildcardIds = this.currCreativeList.wildcardIds;
+      this.creativeSetting.appId = this.currCreativeList.appId;
+      this.creativeSetting.channelApkId = this.currCreativeList.channelApkId;
+      this.creativeSetting.paused = this.currCreativeList.paused;
+      const content = JSON.parse(this.currCreativeList.content);
+      this.app_name = content.app_name;
+      this.title = content.title;
+      this.source = content.source;
+      this.scheme_url = content.scheme_url;
+      this.target_url = content.target_url;
+      this.description = content.description;
+      if (this.creativeSetting.creativeTemplate_id === 4) {
+        this.pic1_img = content.pic1_img;
+      }
+      if (this.creativeSetting.creativeTemplate_id === 5) {
+        this.pic2_img = content.pic1_img;
+      }
+      if (this.creativeSetting.creativeTemplate_id === 34) {
+        this.pic31_img = content.pic1_img;
+        this.pic32_img = content.pic2_img;
+        this.pic33_img = content.pic3_img;
+      }
+      // for (let k in content) {
+      //   if (content.hasOwnProperty(k)) {
+      //     this.creativeSetting.content[k] = content[k];
+      //   }
+      // }
+      console.log(
+        this.creativeSetting,
+        this.currCreativeList,
+        "this.creativeSetting"
+      );
+    },
+    // 根据id获取创意内容
+    getCurrCreativeList() {
+      // Axios.post("api.php", {
+      //   action: "ucAdPut",
+      //   opt: "getCreativeById",
+      //   id: this.currId
+      // })
+      //   .then(res => {
+      //     if (ERR_OK === res.ret) {
+      //       this.currCreativeList = res.data[0];
+      //       this.initEditIdea();
+      //       console.log(
+      //         "根据id获取创意内容this.currCreativeList",
+      //         this.currCreativeList
+      //       );
+      //     }
+      //   })
+      //   .catch(err => {
+      //     console.log("获取创意内容错误：" + err);
+      //   });
+      // 本地测试
+      this.currCreativeList = unitbyid.data[0].adgroup_name;
     },
     // 获取单元名称列表
     getAdgroupNameList() {
@@ -373,9 +859,10 @@ export default {
       //   adgroup_id: this.adgroupId
       // })
       //   .then(res => {
-      //     console.log("获取单元名称列表", res);
       //     if (ERR_OK === res.ret) {
-      //       this.adgroupName = res.data[0].adgroup_name;
+      //       const unit = res.data[0];
+      //       console.log("获取单元名称列表", unit);
+      //       this.adgroupName = unit.adgroup_name;
       //     }
       //   })
       //   .catch(err => {
@@ -387,6 +874,7 @@ export default {
     // 获取计划名称
     getCampaignName() {
       this.campaignNameList.forEach(campaign => {
+        // console.log("campaign", campaign.campaign_id, this.campaignId)
         if (campaign.campaign_id === this.campaignId) {
           this.campaignName = campaign.campaign_name;
         }
@@ -399,16 +887,17 @@ export default {
       //   opt: "getCampaignNameList"
       // })
       //   .then(res => {
-      //     console.log("获取计划名称列表", res);
       //     if (ERR_OK === res.ret) {
       //       this.campaignNameList = res.data;
+      //       this.getCampaignName();
       //     }
       //   })
       //   .catch(err => {
       //     console.log("获取计划名称列表错误：" + err);
-      //   });
+      // });
       // 本地测试
       this.campaignNameList = getCampaignNameList.data;
+      this.getCampaignName();
     },
     // 获取广告样式列表
     getCreativeTemplates() {
@@ -420,7 +909,11 @@ export default {
       //   .then(res => {
       //     if (ERR_OK === res.ret) {
       //       this.creativeTemplates = res.data;
-      //       console.log(this.creativeTemplates, "creativeTemplates");
+      // this.creativeSetting.creativeTemplate_id = res.data[0].creativeTemplateId;
+      //       this.creativeTemplates.forEach((it) => {
+      //         this.currCreativeTemplatesIdList.push(it.creativeTemplateId);
+      //       });
+      //       console.log(this.creativeTemplates, this.currCreativeTemplatesIdList, " 获取广告样式列表");
       //       this.$Message.success("获取广告样式列表数据更新成功");
       //     }
       //   })
@@ -429,42 +922,166 @@ export default {
       //   });
       // 本地测试
       this.creativeTemplates = creativeTemplates.data;
+      this.creativeSetting.creativeTemplate_id =
+        creativeTemplates.data[0].creativeTemplateId;
+      this.creativeTemplates.forEach((vp, ip) => {
+        this.currCreativeTemplatesIdList.push(vp.creativeTemplate_id);
+        this.creativeTemplatesFieldsList.push({
+          id: vp.creativeTemplateId,
+          content: {}
+        });
+        this.creativeTemplatesViewList.push({
+          id: vp.creativeTemplateId,
+          creativeTemplateName: vp.creativeTemplateName
+        });
+        if (vp.creativeTemplateName.indexOf("三图")) {
+          this.creativeTemplatesViewList[ip]["style"] = "three";
+        } else if (vp.creativeTemplateName.indexOf("大图")) {
+          this.creativeTemplatesViewList[ip]["style"] = "big";
+        } else if (vp.creativeTemplateName.indexOf("小图")) {
+          this.creativeTemplatesViewList[ip]["style"] = "small";
+        }
+        vp.creativeTemplateFields.forEach((vc, ic) => {
+          this.creativeTemplatesFieldsList[ip].content[vc.key] = "";
+          if (vc.alias === "图片") {
+            // this.creativeTemplatesViewList[ip][vc.key] = vc["key"];
+            // this.creativeTemplatesViewList[ip][vc.alias] = vc["alias"];
+            // this.creativeTemplatesViewList[ip][vc.] = vc["tips"];
+            // this.creativeTemplatesViewList[ip]["size"] = vc["size"];
+          }
+        });
+      });
+      console.log(
+        "xxx",
+        this.creativeTemplatesFieldsList,
+        this.creativeTemplatesViewList
+      );
+    },
+    getImageField(templateId) {
+      switch (templateId) {
+        case 4:
+          return {
+            pic1_img: this.pic1_img
+          };
+          break;
+        case 5:
+          return {
+            pic1_img: this.pic2_img
+          };
+          break;
+        case 34:
+          return {
+            pic1_img: this.pic31_img,
+            pic2_img: this.pic32_img,
+            pic3_img: this.pic33_img
+          };
+          break;
+      }
+    },
+    // 新建创意
+    addIdea() {
+      let creative = deepClone(this.creativeSetting);
+      Object.assign(
+        creative.content,
+        this.getImageField(this.creativeSetting.creativeTemplate_id)
+      );
+      creative.content.target_url = "http://www.tanwan.com/";
+      console.log("xxx", creative);
+      let addParams = Object.assign({}, creative, {
+        action: "ucAdPut",
+        opt: "addCreative",
+        campaign_id: parseInt(this.$route.query.campaign_id),
+        creativeTemplate_id: 1
+      });
+      console.log("新建创意参数", this.creativeSetting, creative, addParams);
+      Axios.post("api.php", addParams)
+        .then(res => {
+          if (ERR_OK === res.ret) {
+            this.creativeId = res.data.creative_id;
+            console.log(this.creativeId, " 新建创意id");
+            this.$Message.success("新建推广创意成功");
+          }
+        })
+        .catch(err => {
+          console.log("新建推广创意错误：" + err);
+        });
+    },
+    // 编辑创意
+    updateIdea() {
+      // let params = Object.assign({}, this.creativeSetting, {
+      //   do: "edit",
+      //   action: "ucAdPut",
+      //   opt: "updateCreative",
+      //   creative_id: this.creativeId,
+      //   campaign_id: parseInt(this.creativeSetting.campaign_id),
+      //   videoId: parseInt(this.creativeSetting.videoId),
+      //   creativeTemplate_id: parseInt(this.creativeSetting.creativeTemplate_id),
+      //   appId: parseInt(this.creativeSetting.appId),
+      //   channelApkId: parseInt(this.creativeSetting.channelApkId),
+      //   paused: parseInt(this.creativeSetting.paused)
+      // });
+      let params = Object.assign({}, this.currCreativeList, {
+        action: "ucAdPut",
+        opt: "updateCreative"
+      });
+      console.log("编辑创意", params);
+      Axios.post("api.php", params)
+        .then(res => {
+          if (ERR_OK === res.ret) {
+            this.creativeId = res.data.creative_id;
+            console.log(this.creativeId, "creativeId");
+            this.$Message.success("编辑创意成功");
+          }
+        })
+        .catch(err => {
+          console.log("编辑创意错误：" + err);
+        });
     },
     // 返回提交创意
-    handleSumbit() {},
+    handleSumbit() {
+      if (this.isEdit) {
+        this.updateIdea();
+      } else {
+        this.addIdea();
+      }
+    },
     // 返回上级路由
     handleGoBack() {
       this.$router.go(-1);
     },
     // 获取account信息
     getAccountInfo() {
-      const query = this.$route.query;
-      const params = this.$route.params;
-      console.log("idea router query", query, params);
-      this.adCustomPlan.account_id = query.account;
-      if (
-        typeof query === "object" &&
-        query.account &&
-        query.edit &&
-        query.edit === "1"
-      ) {
-        if (params && params.account_id) {
-          this.isEdit = true;
-        } else {
-          this.handleGoBack();
-        }
+      let query = this.$route.query;
+      this.creativeSetting.account_id = query.account;
+      this.creativeSetting.adgroup_id = query.adgroup_id;
+      this.creativeSetting.campaign_id = query.campaign_id;
+      // console.log("getAccountInfo", this.creativeSetting, this.$route.query.id)
+      if (query.edit && query.edit === "1") {
+        this.isEdit = true;
+        this.currId = this.$route.query.id;
       } else {
         this.isEdit = false;
       }
     }
   },
   mounted() {
-    this.getCampaignName();
+    this.actionUrl =
+      "http://ads.tanwan.com/api.php?action=ucAdPut&opt=adsimg_doadd&account_id=" +
+      this.accountId +
+      "&target_width=" +
+      this.image.width +
+      "&target_height=" +
+      this.image.height;
   },
   created() {
+    this.getAccountInfo();
+    this.getCreativeTemplates();
     this.getCampaignNameList();
     this.getAdgroupNameList();
-    this.getCreativeTemplates();
+    // if (true) {
+    if (this.isEdit) {
+      this.getCurrCreativeList();
+    }
   },
   components: {}
 };
