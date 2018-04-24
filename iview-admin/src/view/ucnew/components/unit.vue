@@ -91,10 +91,10 @@
           <FormItem class="border-import">
             <h3 slot="label" class="sub-title">导入推广单元</h3>
             <Select @on-change="handleChangeImportPlan" v-model="campaign_name" :clearable="true" class="item-width">
-              <Option v-if="!isEdit && plan.campaign_name&& plan.campaign_name.length > 0" v-for="(plan, index) in importDate.planlist" :value="plan.campaign_name" :key="index">{{plan.campaign_name}}</Option>
+              <Option v-if="!isEdit" v-for="(plan, index) in importDate.planlist" :value="plan.campaign_name" :key="index">{{plan.campaign_name}}</Option>
             </Select>
             <Select @on-change="handleChangeImportUnit" v-model="unitAdgroupName" :clearable="true" class="item-width">
-              <Option v-if="!isEdit && unit.adgroup_name.length > 0" v-for="(unit, index) in importDate.unitlist" :value="unit.adgroup_name" :key="index.id">{{unit.adgroup_name}}</Option>
+              <Option v-if="!isEdit" v-for="(unit, index) in importDate.unitlist" :value="unit.adgroup_name" :key="index.id">{{unit.adgroup_name}}</Option>
             </Select>
             <Button type="text" @click="handleClearImport">重置</Button>
           </FormItem>
@@ -137,7 +137,7 @@
           </Col>
           <Col>
           <Select v-if="!isEdit" @on-change="handleChangeTargeting" v-model="currTargetName" :clearable="true" class="item-width">
-            <Option v-if="targetingList && targetingList.length > 0 && targeting.targeting_name !== null" v-for="(targeting, index) in targetingList" :value="targeting.targeting_name" :key="index">{{targeting.targeting_name}}</Option>
+            <Option v-if="targetingList && targetingList.length > 0" v-for="(targeting, index) in targetingList" :value="targeting.targeting_name" :key="index">{{targeting.targeting_name}}</Option>
           </Select>
           </Col>
         </Row>
@@ -535,13 +535,13 @@
 
 <script>
 // 本地测试代码
-// import planList from "../simple/plan";
-// import unitList from "../simple/unit";
-// import targetingList from "../simple/targeting";
-// import provincesList from "../simple/province";
-// import interestList from "../simple/interest";
-// import convertTypeList from "../simple/convertType";
-// import getCampaignNameList from "../simple/getCampaignNameList";
+import planList from "../simple/plan";
+import unitList from "../simple/unit";
+import targetingList from "../simple/targeting";
+import provincesList from "../simple/province";
+import interestList from "../simple/interest";
+import convertTypeList from "../simple/convertType";
+import getCampaignNameList from "../simple/getCampaignNameList";
 import typeTree from "./typeTree";
 import Axios from "@/api/index";
 const ERR_OK = 1;
@@ -663,7 +663,7 @@ export default {
       } else {
         this.getCampaignUnit();
       }
-
+      
       this.getProvince();
       this.getConvertMonitorTypes();
       this.getInterestTypes();
@@ -915,10 +915,7 @@ export default {
       // 下载监测类型只有投放uc头条，推广方式为打开页面的单元可以设置
       // 如果 推广计划推广资源 不为 1uc头条， 转化类型 为 下载类型，同时 推广方式  不为 1打开页面 则报错
       if (convertType === "下载") {
-        if (
-          this.unitSetting.generalizeType !== "1" &&
-          this.unitSetting.adResourceId !== 1
-        ) {
+        if (this.unitSetting.generalizeType !== "1" && this.unitSetting.adResourceId !== 1) {
           this.isErrConvertType = true;
           this.$Notice.warning({
             title: "温馨提示：",
@@ -1290,6 +1287,7 @@ export default {
       this.unitSetting.bid = 0;
       this.unitSetting.secondBid = 0;
       // 重置定向
+      
     },
     // 事件：处理导入推广单元的计划数据
     handleChangeImportPlan(plan) {
@@ -1551,7 +1549,7 @@ export default {
         .then(res => {
           if (ERR_OK === res.ret) {
             const adg = res.data[0];
-            console.log("根据id获取单元内容接口xxxa", adg);
+            console.log("根据id获取单元内容接口xxx", adg);
             this._assignMethod(this.unitSetting, adg);
             this.paused = adg.paused;
             this.unitSetting.bid = parseInt(this.unitSetting.bid);
@@ -1572,7 +1570,6 @@ export default {
               this.unitSetting.convertMonitorType === "2"
                 ? "下载"
                 : this.unitSetting.convertMonitorType === "1" ? "激活" : "";
-            this.handleChangeConvertMonitorTypes(this.convertMonitorTypeName);
             console.log(
               "根据id获取单元内容接口,在编辑状态下调用",
               this.unitSetting
@@ -1583,18 +1580,18 @@ export default {
           console.log("获取推广单元数据错误：" + err);
         });
       // 本地测试代码
-      // this.importDate.unitlist = unitList.data;
+      this.importDate.unitlist = unitList.data;
     },
     // 获取推广单元数据
     getCampaignUnit() {
       Axios.post("api.php", {
         action: "ucAdPut",
-        opt: "getAdgroupById"
+        opt: "getAdgroupsList",
+        campaign_id: this.$route.query.campaign_id
       })
         .then(res => {
           if (ERR_OK === res.ret) {
             this.importDate.unitlist = res.data;
-            console.log("获取单元内容接口xxx", this.importDate.unitlist);
           }
         })
         .catch(err => {
@@ -1605,26 +1602,26 @@ export default {
     },
     // 获取计划名称列表
     getCampaignNameList() {
-      Axios.post("api.php", {
-        action: "ucAdPut",
-        opt: "getCampaignNameList"
-      })
-        .then(res => {
-          if (ERR_OK === res.ret) {
-            this.importDate.planlist = res.data;
-            console.log(res.data, "获取计划名称列表");
-            res.data.forEach(campaign => {
-              if (campaign.campaign_id === this.unitSetting.campaign_id) {
-                this.campaign_name = campaign.campaign_name;
-              }
-            });
-          }
-        })
-        .catch(err => {
-          console.log("获取计划名称列表错误：" + err);
-        });
+      // Axios.post("api.php", {
+      //   action: "ucAdPut",
+      //   opt: "getCampaignNameList"
+      // })
+      //   .then(res => {
+      //     if (ERR_OK === res.ret) {
+      //       this.importDate.planlist = res.data;
+      //       console.log(res.data, "获取计划名称列表");
+      //       res.data.forEach(campaign => {
+      //         if (campaign.campaign_id === this.unitSetting.campaign_id) {
+      //           this.campaign_name = campaign.campaign_name;
+      //         }
+      //       });
+      //     }
+      //   })
+      //   .catch(err => {
+      //     console.log("获取计划名称列表错误：" + err);
+      //   });
       // 本地测试
-      // this.importDate.planlist = getCampaignNameList.data;
+      this.importDate.planlist = getCampaignNameList.data;
     },
     // 获取定向设置数据
     getTargetingList() {

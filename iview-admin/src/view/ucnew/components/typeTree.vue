@@ -42,7 +42,7 @@ export default {
     },
     tipsText: {
       type: [Array, String],
-      default: []
+      default: () => {[];}
     }
   },
   data() {
