@@ -1,5 +1,5 @@
 <style lang="less" scoped>
-@import url("../index.less");
+@import "../index.less";
 .type-tree {
     padding: 10px 15px;
     max-width: 240px;
