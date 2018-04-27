@@ -46,7 +46,7 @@
     padding-left: 5px;
     width: 70px;
 }
-.weeks .ivu-checkbox-group-item{height: 30px; line-height: 30px;}
+.weeks .ivu-checkbox-group-item{width: 100%; height: 30px; line-height: 30px; float: left;}
 .day_list ul{
     height: 30px;
 }
@@ -134,11 +134,11 @@
                 });            
                 this.date.forEach((item,index)=> {
                     if(isCheck){
-                        this.$set(this.date[index], val, "0");
-                        this.$set(this.day, val, "0");
+                        this.$set(this.date[index], val, '0');
+                        this.$set(this.day, val, '0');
                     }else{
-                        this.$set(this.date[index], val, "1");
-                        this.$set(this.day, val, "1");
+                        this.$set(this.date[index], val, '1');
+                        this.$set(this.day, val, '1');
                     }
                 });
             },
@@ -146,9 +146,9 @@
             checkDate(week,index,val){                
                 console.log(week + '---' + index + '----' + val)
                 if(val == "1"){
-                    this.$set(this.date[week], index, "0");
+                    this.$set(this.date[week], index, '0');
                 }else{
-                    this.$set(this.date[week], index, "1");
+                    this.$set(this.date[week], index, '1');
                 };
             },
             //工作日
@@ -156,9 +156,9 @@
                 for(let i=0; i<=6; i++){
                     for(let d=0; d<=23; d++){                    
                         if(i=='5' || i== '6'){
-                            this.$set(this.date[i], d, "0");
+                            this.$set(this.date[i], d, '0');
                         }else{
-                            this.$set(this.date[i], d, "1");
+                            this.$set(this.date[i], d, '1');
                         }
                     }
                 };
@@ -170,9 +170,9 @@
                 for(let i=0; i<=6; i++){
                     for(let d=0; d<=23; d++){                    
                         if(i=='5' || i== '6'){
-                            this.$set(this.date[i], d, "1");
+                            this.$set(this.date[i], d, '1');
                         }else{
-                            this.$set(this.date[i], d, "0");
+                            this.$set(this.date[i], d, '0');
                         }
                     }
                 };
@@ -183,7 +183,7 @@
             all(){
                 for(let i=0; i<=6; i++){
                     for(let d=0; d<=23; d++){                    
-                        this.$set(this.date[i], d, "1");
+                        this.$set(this.date[i], d, '1');
                     }
                 };
                 this.week = ['0','1','2','3','4','5','6'];
@@ -197,7 +197,7 @@
                             j=j-1;  
                         }  
                     }  
-                }   
+                }  
                 return a; 
             },
             //设置日期
@@ -224,14 +224,18 @@
                 let news = n.length, old = o.length; 
                 let newsArr = n.concat([]), oldArr = o.concat([]);
                 if(news<old){
-                    let less = this.arrayDiff(oldArr,newsArr)[0];
+                    let less = this.arrayDiff(oldArr,newsArr);
+                    if(less.length==0) return
+                    less = less[0]
                     for(let l=0;l<=23;l++){
-                        this.$set(this.date[less], l, "0");
+                        this.$set(this.date[less], l, '0');
                     }
                 }else{
-                    let plus = this.arrayDiff(newsArr,oldArr)[0];
+                    let plus = this.arrayDiff(newsArr,oldArr);
+                    if(plus.length==0) return
+                    plus = plus[0]
                     for(let i=0;i<=23;i++){
-                        this.$set(this.date[plus], i, "1");
+                        this.$set(this.date[plus], i, '1');
                     }
                 }
             },
