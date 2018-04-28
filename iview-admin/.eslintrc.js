@@ -26,6 +26,9 @@ module.exports = {
     // allow debugger during development
     'no-debugger': process.env.NODE_ENV === 'production' ? 'error' : 'off',
     'space-before-function-paren': ['error', 'never'],
-    'one-var': ["error", { var: "always", let: "never", const: "never" }]
+    'one-var': ["error", { var: 'always', let: 'never', const: 'never' }],
+    'quotes': ['error', 'single'],
+    'semi': ['error', 'never'],
+    'vue/no-parsing-error': [2, { 'x-invalid-end-tag': false }] // 不检查标签，在使用框架时跳过组件标签检查适用
   }
 }

@@ -373,9 +373,9 @@ button.ivu-btn {
 <script>
 import Axios from '@/api/index'
 import { deepClone } from '@/utils/DateShortcuts.js'
-import unitbyid from '../simple/unitbyid'
-import getCampaignNameList from '../simple/getCampaignNameList'
-import creativeTemplates from '../simple/creativeTemplates'
+import unitbyid from '../simple/unitbyid.json'
+import getCampaignNameList from '../simple/getCampaignNameList.json'
+import creativeTemplates from '../simple/creativeTemplates.json'
 const ERR_OK = 1
 export default {
   // 图片模板类型： 大图：big，小图：small，三图：three
@@ -621,12 +621,12 @@ export default {
           title: '温馨提示：',
           desc: '点击URL字符长度不能大于1024个字符'
         })
-        this.isUrlErr = true;
+        this.isUrlErr = true
       } else {
-        this.isUrlErr = false;
+        this.isUrlErr = false
       }
       if (reg.test(currStr)) {
-        this.isUrlErr = false;
+        this.isUrlErr = false
       } else {
         this.$Notice.warning({
           title: '温馨提示：',
@@ -646,12 +646,12 @@ export default {
           title: '温馨提示：',
           desc: '点击URL字符长度不能大于1024个字符'
         })
-        this.isUrlErr = true;
+        this.isUrlErr = true
       } else {
-        this.isUrlErr = false;
+        this.isUrlErr = false
       }
       if (reg.test(currStr)) {
-        this.isUrlErr = false;
+        this.isUrlErr = false
       } else {
         this.$Notice.warning({
           title: '温馨提示：',
@@ -768,7 +768,6 @@ export default {
       })
     },
     handleChangeTemplate(id) {
-      console.log('id', id, typeof id, this.creativeTemplates)
       this.initCurrCreativeTemplates(id)
       console.log('currCreativeTemplates', this.currCreativeTemplates)
       this.initImageInfo(this.currCreativeTemplates)
@@ -829,51 +828,51 @@ export default {
     },
     // 根据id获取创意内容
     getCurrCreativeList() {
-      // Axios.post('api.php', {
-      //   action: 'ucAdPut',
-      //   opt: 'getCreativeById',
-      //   id: this.currId
-      // })
-      //   .then(res => {
-      //     if (ERR_OK === res.ret) {
-      //       let getCurrCreativeList = res.data;
-      //       getCurrCreativeList.forEach(c => {
-      //         if (c.creative_id === this.creativeId) {
-      //           this.currCreativeList = c
-      //         }
-      //       })
-      //       this.initEditIdea(this.currCreativeList)
-      //       console.log(
-      //         '根据id获取创意内容this.currCreativeList',
-      //         this.currCreativeList
-      //       )
-      //     }
-      //   })
-      //   .catch(err => {
-      //     console.log('获取创意内容错误：' + err)
-      //   })
+      Axios.post('api.php', {
+        action: 'ucAdPut',
+        opt: 'getCreativeById',
+        id: this.currId
+      })
+        .then(res => {
+          if (ERR_OK === res.ret) {
+            let getCurrCreativeList = res.data;
+            getCurrCreativeList.forEach(c => {
+              if (c.creative_id === this.creativeId) {
+                this.currCreativeList = c
+              }
+            })
+            this.initEditIdea(this.currCreativeList)
+            console.log(
+              '根据id获取创意内容this.currCreativeList',
+              this.currCreativeList
+            )
+          }
+        })
+        .catch(err => {
+          console.log('获取创意内容错误：' + err)
+        })
       // 本地测试
-      this.currCreativeList = unitbyid.data[0].adgroup_name
+      // this.currCreativeList = unitbyid.data[0].adgroup_name
     },
     // 获取单元名称列表
     getAdgroupNameList() {
-      // Axios.post('api.php', {
-      //   action: 'ucAdPut',
-      //   opt: 'getAdgroupById',
-      //   adgroup_id: this.adgroupId
-      // })
-      //   .then(res => {
-      //     if (ERR_OK === res.ret) {
-      //       const unit = res.data[0]
-      //       this.adgroupName = unit.adgroup_name
-      //       console.log('获取单元名称列表', unit, this.adgroupName)
-      //     }
-      //   })
-      //   .catch(err => {
-      //     console.log('获取单元名称列表错误：' + err)
-      //   })
+      Axios.post('api.php', {
+        action: 'ucAdPut',
+        opt: 'getAdgroupById',
+        adgroup_id: this.adgroupId
+      })
+        .then(res => {
+          if (ERR_OK === res.ret) {
+            const unit = res.data[0]
+            this.adgroupName = unit.adgroup_name
+            console.log('获取单元名称列表', unit, this.adgroupName)
+          }
+        })
+        .catch(err => {
+          console.log('获取单元名称列表错误：' + err)
+        })
       // 本地测试
-      this.adgroupName = unitbyid.data[0].adgroup_name
+      // this.adgroupName = unitbyid.data[0].adgroup_name
     },
     // 获取计划名称
     getCampaignName() {
@@ -885,22 +884,22 @@ export default {
     },
     // 获取计划名称列表
     getCampaignNameList() {
-      // Axios.post('api.php', {
-      //   action: 'ucAdPut',
-      //   opt: 'getCampaignNameList'
-      // })
-      //   .then(res => {
-      //     if (ERR_OK === res.ret) {
-      //       this.campaignNameList = res.data
-      //       this.getCampaignName()
-      //     }
-      //   })
-      //   .catch(err => {
-      //     console.log('获取计划名称列表错误：' + err)
-      //   })
+      Axios.post('api.php', {
+        action: 'ucAdPut',
+        opt: 'getCampaignNameList'
+      })
+        .then(res => {
+          if (ERR_OK === res.ret) {
+            this.campaignNameList = res.data
+            this.getCampaignName()
+          }
+        })
+        .catch(err => {
+          console.log('获取计划名称列表错误：' + err)
+        })
       // 本地测试
-      this.campaignNameList = getCampaignNameList.data
-      this.getCampaignName()
+      // this.campaignNameList = getCampaignNameList.data
+      // this.getCampaignName()
     },
     // 获取广告样式列表
     getCreativeTemplates() {
@@ -915,7 +914,7 @@ export default {
             if (res.data.length < 1) {
               location.reload()
             }
-            console.log('sadf xx===== getCreativeemplates', res.data)
+            console.log('广告样式列表模板=== getCreativeemplates', res.data)
             this.creativeTemplates = res.data
             this.creativeSetting.creativeTemplate_id = res.data[0].creativeTemplateId
             if (this.creativeTemplates.length < 1) {
@@ -962,7 +961,6 @@ export default {
           console.log('获取广告样式列表错误：' + err)
         })
       // 本地测试
-      console.log('sadf xx===== getCreativeTemplates', res.data)
       this.creativeTemplates = creativeTemplates.data
       this.creativeSetting.creativeTemplate_id = creativeTemplates.data[0].creativeTemplateId
       if (this.creativeTemplates.length < 1) {
@@ -1028,7 +1026,7 @@ export default {
           }
         }
       });
-      console.log('sfsmallretContent', retContent)
+      console.log('getImageField', retContent)
       return retContent
     },
     // 新建创意
@@ -1038,7 +1036,6 @@ export default {
         creative.content,
         this.getImageField(this.creativeSetting.creativeTemplate_id)
       )
-      console.log('creativexxx', creative)
       let addParams = Object.assign({}, creative, {
         action: 'ucAdPut',
         opt: 'addCreative',
@@ -1080,7 +1077,7 @@ export default {
         .then(res => {
           if (ERR_OK === res.ret) {
             this.creativeId = res.data.creative_id
-            console.log(this.creativeId, 'creativeId')
+            console.log(this.creativeId, '编辑创意成功')
             this.$Message.success('编辑创意成功')
             this.handleGoBack()
           }
@@ -1132,5 +1129,5 @@ export default {
     this.getAdgroupNameList()
   },
   components: {}
-};
+}
 </script>
