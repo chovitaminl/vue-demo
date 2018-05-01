@@ -1,12 +1,14 @@
 <style lang="less" scoped>
 @import "../index.less";
 .type-tree {
+  .content{
     padding: 10px 15px;
-    max-width: 240px;
-    max-height: 270px;
+    width: 240px;
+    height: 270px;
     overflow-y: scroll;
     border: 1px solid #ccc;
     box-sizing: border-box;
+  }
 }
 </style>
 
@@ -15,10 +17,10 @@
     <h4 class="title">
       <Checkbox v-model="isChecked" :disabled="true">
         {{treeTitle}}
-        <Tooltip placement="bottom">
+        <Tooltip v-if="tipTxt.length > 0" placement="bottom" :transfer="true">
           <Icon type="help-circled"></Icon>
           <div slot="content">
-            <p v-for="(tip, index) in tipsText" :key="index">{{tip}}</p>
+            <p v-for="(tip, index) in tipTxt" :key="index">{{tip}}</p>
           </div>
         </Tooltip>
       </Checkbox>
@@ -38,23 +40,34 @@ export default {
     },
     treeData: {
       type: [Array, Object],
-      default: []
+      default: (() => [])
     },
     tipsText: {
-      type: [Array, String],
-      default: () => {[];}
+      type: Array,
+      default: (() => [])
+    },
+    interestValue: {
+      type: Number,
+      default: -1
     }
   },
   data() {
     return {
       isChecked: false,
-      tipTxt: ""
+      tipTxt: this.tipsText
     };
   },
   methods: {
     handleTree(list) {
       this.isChecked = list.length > 0 ? true : false;
-      this.$emit("on-change", list);
+      let ret = {
+        value: 0,
+        list: list
+      }
+      if (this.interestValue > 0) {
+        ret.value = this.interestValue
+      }
+      this.$emit('on-change', ret);
     }
   }
 };

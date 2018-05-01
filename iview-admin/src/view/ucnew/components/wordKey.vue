@@ -1,5 +1,5 @@
 <style lang="less" scoped>
-@import url("../index.less");
+@import "../index.less";
 .work-key {
     padding: 10px 15px;
     max-width: 240px;

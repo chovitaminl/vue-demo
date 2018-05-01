@@ -1,5 +1,5 @@
 <style scoped lang="less">
-@import url("../index.less");
+@import "../index.less";
 .vertical-center-modal {
   display: flex;
   align-items: center;
@@ -100,13 +100,13 @@
 </template>
 
 <script>
+// 本地测试代码
+import planList from '../simple/plan.json'
 import Axios from '@/api/index'
 import { deepClone } from '@/utils/DateShortcuts'
 import weekDate from '@/components/week-date/index'
 const SET_END_DATE_UNLIMITED = '2099-01-01'
-const ERR_OK = 1;
-// 本地测试代码
-import planList from '../simple/plan'
+const ERR_OK = 1
 export default {
   data() {
     return {
@@ -178,7 +178,7 @@ export default {
     // 匹配特殊字符，含有返回true
     judgeSpecial(str) {
       let pattern = new RegExp(
-        "[`~!@#$^&*()=|{}':;',\\[\\].<>/?~！@#￥……&*（）——|{}【】‘；：”“'。，、？]"
+        '[`~!@#$^&*()=|{}' + ':;,\\[\\].<>/?~！@#￥……&*（）——|{}【】‘；：”“。，、？]'
       )
       if (pattern.exec(str)) {
         return true
@@ -233,7 +233,7 @@ export default {
     addCampaign() {
       if (!this.adCustomPlan.campaign_name) {
         this.$Notice.warning({
-        title: '计划名称不能为空'
+          title: '计划名称不能为空'
         })
         return
       }
@@ -249,10 +249,6 @@ export default {
       // Axios.post('api.php', update)
       //   .then(res => {
       //     if (ERR_OK === res.ret) {
-      //       // 广告位单页。不是用路由导航时使用
-      //       // this.planInfo.campaignId = res.data.campaign_id
-      //       // this.planInfo.campaignName = this.adCustomPlan.campaign_name
-      //       // this.$emit("save-plan", this.planInfo)
       //       this.$Message.success('新建推广计划数据提交成功')
       //       this.$router.push({
       //         name: 'ucunit',
@@ -273,7 +269,7 @@ export default {
         name: 'ucunit',
         query: {
           account: this.adCustomPlan.account_id,
-          campaign_id: res.data.campaign_id
+          campaign_id: '30441770'
         }
       })
     },
@@ -324,7 +320,7 @@ export default {
     // 监听日预算开关按钮
     handleChangeBudget(budgetSwitch) {
       switch (budgetSwitch) {
-        case '1':
+        case '0':
           this.isDisableBudget = true
           this.adCustomPlan.budget = -1
           break
@@ -359,16 +355,14 @@ export default {
           this.adCustomPlan.adResourceId = parseInt(plan.adResourceId)
           let budget = plan.budget
           this.budgetStatus = budget === '-1' ? '0' : '1'
-          this.isDisableBudget = budget === '-1' ? true : false
+          this.isDisableBudget = budget === '-1'
           this.adCustomPlan.budget = parseInt(budget)
           this.adCustomPlan.startDate = plan.startDate
-          this.isDisableEndDate =
-            plan.endDate === SET_END_DATE_UNLIMITED ? true : false
-          this.endDateStatus =
-            plan.endDate === SET_END_DATE_UNLIMITED ? '0' : '1'
+          this.isDisableEndDate = plan.endDate === SET_END_DATE_UNLIMITED
+          this.endDateStatus = plan.endDate === SET_END_DATE_UNLIMITED ? '0' : '1'
           this.adCustomPlan.endDate = plan.endDate
           this._norimalizeWeekDayStatus(JSON.parse(plan.schedule))
-          this.handleWeekTime();
+          this.handleWeekTime()
         }
       })
     },
@@ -426,7 +420,7 @@ export default {
           this.adCustomPlan.budget =
             plan.budget === '-1' ? 100 : parseInt(plan.budget)
           this.budgetStatus = plan.budget === '-1' ? '0' : '1'
-          this.isDisableBudget = plan.budget === '-1' ? true : false
+          this.isDisableBudget = plan.budget === '-1'
           this.paused = plan.paused
           this.planInfo.campaignId = plan.campaign_id
           this.adCustomPlan.adResourceId = parseInt(plan.adResourceId)
@@ -441,7 +435,6 @@ export default {
           this.adCustomPlan.friday = schedule.friday
           this.adCustomPlan.saturday = schedule.saturday
           this.adCustomPlan.sunday = schedule.sunday
-          return
         }
       })
     },
@@ -456,7 +449,6 @@ export default {
         'saturday',
         'sunday'
       ]
-      let ret = []
       for (let i = 0; i < week.length; i++) {
         for (let k in list) {
           if (week[i] === k) {
@@ -475,13 +467,13 @@ export default {
     }
   },
   mounted() {
-    this.getAccountInfo();
+    this.getAccountInfo()
   },
   created() {
-    this.campaignPlan();
+    this.campaignPlan()
   },
   components: {
     weekDate
   }
-};
+}
 </script>
