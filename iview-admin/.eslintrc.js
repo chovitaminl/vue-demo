@@ -25,7 +25,9 @@ module.exports = {
     'generator-star-spacing': 'off',
     // allow debugger during development
     'no-debugger': process.env.NODE_ENV === 'production' ? 'error' : 'off',
-    'space-before-function-paren': ['error', 'never'],
-    'one-var': ["error", { var: "always", let: "never", const: "never" }]
+    'space-before-function-paren': ['error', 'never'], // 函数前面括弧是否有空格
+    'one-var': ["error", { var: "always", let: "never", const: "never" }], // 声明变量
+    'quotes': ["error", "single"], // 引号
+    'semi': ["error", "never"] // 块结尾分号
   }
 }
