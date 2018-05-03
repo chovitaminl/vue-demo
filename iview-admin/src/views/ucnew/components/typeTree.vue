@@ -36,7 +36,7 @@ export default {
   props: {
     treeTitle: {
       type: String,
-      default: ""
+      default: ''
     },
     treeData: {
       type: [Array, Object],
@@ -55,11 +55,11 @@ export default {
     return {
       isChecked: false,
       tipTxt: this.tipsText
-    };
+    }
   },
   methods: {
     handleTree(list) {
-      this.isChecked = list.length > 0 ? true : false;
+      this.isChecked = list.length > 0
       let ret = {
         value: 0,
         list: list
@@ -67,8 +67,8 @@ export default {
       if (this.interestValue > 0) {
         ret.value = this.interestValue
       }
-      this.$emit('on-change', ret);
+      this.$emit('on-change', ret)
     }
   }
-};
+}
 </script>

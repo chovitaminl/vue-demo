@@ -54,7 +54,7 @@
 </template>
 
 <script>
-import CountUp from 'countup';
+import CountUp from 'countup'
 export default {
   name: 'infoCard',
   props: {
@@ -117,15 +117,15 @@ export default {
       setTimeout(() => {
         if (!this.eleId) {
           console.warn("countUp没有绑定DOM，请设置")
-          return;
+          return
         }
-        this.initCountUp();
-      }, this.delay);
+        this.initCountUp()
+      }, this.delay)
     })
   },
   methods: {
     initCountUp() {
-      let cu = {};
+      let cu = {}
       this.cu =  cu = new CountUp(
       this.eleId,
       this.countUp.startVal,
@@ -135,9 +135,9 @@ export default {
       this.countUp.options,
       );
       if (!cu.error) {
-        cu.start();
+        cu.start()
       }
     }
   }
-};
+}
 </script>

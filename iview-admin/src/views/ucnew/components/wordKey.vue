@@ -34,29 +34,29 @@ export default {
   props: {
     treeTitle: {
       type: String,
-      default: ""
+      default: ''
     },
     words: {
       type: [Array, Object, String],
-      default: []
+      default: (() => [])
     },
     tipsText: {
       type: [Array, String],
-      default: []
+      default: (() => [])
     }
   },
   data() {
     return {
       isChecked: false,
-      tipTxt: "",
+      tipTxt: '',
       wordList: []
-    };
+    }
   },
   methods: {
     handleTree(list) {
-      this.isChecked = list.length > 0 ? true : false;
-      this.$emit("on-change", list);
+      this.isChecked = list.length > 0
+      this.$emit('on-change', list)
     }
   }
-};
+}
 </script>
