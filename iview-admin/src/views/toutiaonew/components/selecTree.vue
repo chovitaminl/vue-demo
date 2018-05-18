@@ -155,6 +155,7 @@ export default {
       currValueList: [],
       currNameList: [],
       currChildren: [],
+      currTitle: '',
       currType: '',
       isSelectAll: false
     }
@@ -194,6 +195,8 @@ export default {
         name: this.currNameList,
         children: this.currChildren,
         type: this.currType,
+        title: this.currTitle,
+        childrenLen: this.currChildren.length,
         checked: false
       })
       console.log('selectAll', this.currValueList, this.currNameList)
@@ -222,13 +225,14 @@ export default {
     },
     handleTreeItem(params) {
       this.setCurrChecked(params)
-
       this.$emit('on-change', {
         currValue: this.currValue,
         value: this.currValueList,
         name: this.currNameList,
         children: this.currChildren,
         type: this.currType,
+        title: this.currTitle,
+        childrenLen: this.currChildren.length,
         checked: false
       })
     },

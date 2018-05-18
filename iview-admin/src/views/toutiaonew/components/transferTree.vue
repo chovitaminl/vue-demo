@@ -115,6 +115,7 @@
 <script>
 import selecTree from './selecTree';
 import filterTree from './filterTree';
+import { deepClone } from '@/utils/DateShortcuts.js'
 export default {
   name: 'transferTree',
   components: {
@@ -187,12 +188,12 @@ export default {
     data(newVal) {
       this.treeData = newVal
       // this.provinceOrgin = this.getProvince(this.treeData)
-      this.provinceOrgin = this.treeData
+      this.provinceOrgin = deepClone(this.treeData)
     }
   },
   mounted() {
     this.treeData = this.data
-    this.provinceOrgin = this.treeData
+    this.provinceOrgin = deepClone(this.treeData)
   },
   methods: {
     handleFilterChange(val) {
@@ -221,6 +222,7 @@ export default {
       console.log('handleCityChange', val)
     },
     handleProvinceChange(val) {
+      console.log('val', val)
       val.children.forEach(p => {
         if (!p.selected) {
           p.selected = true
