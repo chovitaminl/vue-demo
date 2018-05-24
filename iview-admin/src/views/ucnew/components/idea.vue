@@ -1,5 +1,5 @@
 <style scoped lang="less">
-@import "../index.less";
+@import url("../index.less");
 .vertical-center-modal {
   display: flex;
   align-items: center;
@@ -229,8 +229,7 @@ button.ivu-btn {
         </RadioGroup> -->
 
         <RadioGroup @on-change="handleChangeTemplate" v-model="creativeSetting.creativeTemplate_id">
-          <!-- <Radio v-if="creativeTemplates && creativeTemplates.length > 0" v-for="(template, index) in creativeTemplates" :key="index" :label="template.creativeTemplateId" :class="{'btn-green': creativeSetting.creativeTemplate_id === template.creativeTemplateId}" :disabled="isEdit" class="item">{{template.creativeTemplateName}}</Radio> -->
-          <Radio v-if="creativeTemplates && creativeTemplates.length > 0" v-for="(template, index) in creativeTemplates" :key="index" :label="template.creativeTemplateId" :class="{'btn-green': creativeSetting.creativeTemplate_id === template.creativeTemplateId}" class="item">{{template.creativeTemplateName}}</Radio>
+          <Radio v-if="creativeTemplates && creativeTemplates.length > 0" v-for="(template, index) in creativeTemplates" :key="index" :label="template.creativeTemplateId" :class="{'btn-green': creativeSetting.creativeTemplate_id === template.creativeTemplateId}" :disabled="isEdit" class="item">{{template.creativeTemplateName}}</Radio>
         </RadioGroup>
 
       </div>
@@ -460,12 +459,12 @@ button.ivu-btn {
 </template>
 
 <script>
-import unitbyid from '../simple/unitbyid'
-import getCampaignNameList from '../simple/getCampaignNameList'
-import creativeTemplates from '../simple/creativeTemplates'
+// import unitbyid from '../simple/unitbyid'
+// import getCampaignNameList from '../simple/getCampaignNameList'
+// import creativeTemplates from '../simple/creativeTemplates'
 import Axios from '@/api/index'
 import { deepClone } from '@/utils/DateShortcuts.js'
-// import util from '@/utils/index'
+import util from '@/utils/index'
 const ERR_OK = 1
 export default {
   // 图片模板类型： 大图：big，小图：small，三图：three
