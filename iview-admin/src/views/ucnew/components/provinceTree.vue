@@ -76,7 +76,7 @@
             </span>
           </span>
         </div>
-      </div>    
+      </div>
       <div class="scroll-y">
         <Tree @on-check-change="handleChangeProvinceTree" :data="provinceTreeList" show-checkbox></Tree>
       </div>
@@ -84,12 +84,8 @@
   </div>
 </template>
 <script>
-import selected from './selected'
 export default {
   name: 'ProvinceTree',
-  components: {
-    selected
-  },
   props: {
     value: {
       type: Array,
@@ -209,7 +205,7 @@ export default {
       } 
 
       this.handleChangeProvinceTree()
-      this.countSelectTotal(this.provinceTreeList)
+      // this.countSelectTotal(this.provinceTreeList)
     },
     // tree
     handleChangeProvinceTree(provinceList) {
@@ -224,26 +220,22 @@ export default {
       // })
 
       // 情况2
-      let len = 0
       this.provinceTreeList.forEach((p, ip) => {
         if (p.checked && !p.indeterminate) {
           retValue.push(p.value)
           retName.push(p.title)
-          ++len
         } else if (!p.checked && p.indeterminate) {
           let cName = []
           p.children.forEach((c, ic) => {
             if (c.checked) {
               retValue.push(c.value)
-              cName.push(c.title)
-              ++len
             }
           })
           retName[ip] = `${p.title}(${cName.join('、')})`
         }
       })
 
-      this.selectTotal = len
+      this.selectTotal = retValue.length
       this.retValue = retValue
       this.retName = retName
 
