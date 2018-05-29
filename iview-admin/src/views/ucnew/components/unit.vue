@@ -140,7 +140,6 @@
           <h3 class="sub-title color-green">定向设置</h3>
           </Col>
           <Col>
-
           <Select v-if="!isEdit" @on-change="handleChangeTargeting" :loading="loading" loading-text="加载中，请稍后..." v-model="currTargetName" class="item-width">
             <Option v-if="targetingList && targetingList.length > 0 && targeting.targeting_name !== null" v-for="(targeting, index) in targetingList" :value="targeting.targeting_name" :key="index">{{targeting.targeting_name}}</Option>
           </Select>
@@ -1083,11 +1082,11 @@ export default {
       this.evaluate.provinceTxt = this.normalizeTxtShow(nameList)
       console.log(provinceList, valueList, nameList, '----handleProvinceChange-')
 
-      // 判断编辑状态下，定向更改
-      if (this.isEdit) {
-        this.isEditTargetingChange += 1
-      }
-    },
+    //   // 判断编辑状态下，定向更改
+    //   if (this.isEdit) {
+    //     this.isEditTargetingChange += 1
+    //   }
+    // },
     handleSearchApp() {
       this.getRecommend({type: 'app', seeds: [this.interestSearch]})
     },
@@ -1786,6 +1785,23 @@ export default {
         action: 'ucAdPut',
         opt: 'getCounty',
         account_id: this.accountId + ''
+      }).then(res => {
+        if (res.ret === 1) {
+          this.cityList = res.data.countyTrees
+        }
+      }).catch(err => {
+        console.log('获取区县列表错误', err)
+      })
+    },
+    // 获取区县列表
+    getCounty() {
+      if (this.cityList.length > 0) {
+        return
+      }
+      Axios.post('api.php', {
+        action: 'ucAdPut',
+        opt: 'getCounty',
+        account_id: this.accountId+''
       }).then(res => {
         if (res.ret === 1) {
           this.cityList = res.data.countyTrees
