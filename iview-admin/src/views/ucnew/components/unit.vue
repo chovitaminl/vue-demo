@@ -1086,7 +1086,7 @@ export default {
     //   if (this.isEdit) {
     //     this.isEditTargetingChange += 1
     //   }
-    // },
+    },
     handleSearchApp() {
       this.getRecommend({type: 'app', seeds: [this.interestSearch]})
     },
